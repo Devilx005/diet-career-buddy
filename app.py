@@ -151,7 +151,7 @@ if not st.session_state.logged_in:
         position: fixed !important;
         top: 0px !important;
         right: 0px !important;
-        z-index: 1001 !important;
+        z-index: 1 !important;
     }
     </style>
     """, unsafe_allow_html=True)
