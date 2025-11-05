@@ -125,20 +125,24 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
-            <form method="post" action="">
-                <button type="submit" name="login_trigger" value="true" style="
-                    background: rgba(16, 163, 127, 0.8);
-                    color: white;
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 13px;
-                ">🔐 Login Trigger</button>
-            </form>
+            <button onclick="showLogin()" style="
+                background: rgba(16, 163, 127, 0.8);
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 13px;
+            ">🔐 Login Trigger</button>
         </div>
     </div>
+    
+    <script>
+    function showLogin() {
+        window.parent.postMessage({type: 'SHOW_LOGIN'}, '*');
+    }
+    </script>
     '''
 
 
@@ -149,10 +153,26 @@ st.markdown(header_html, unsafe_allow_html=True)
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
 
-# Check for login trigger from header button
-if not st.session_state.logged_in and 'login_trigger' in st.query_params:
+# JavaScript message listener
+st.markdown("""
+<script>
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'SHOW_LOGIN') {
+        // Trigger login form by setting session state
+        const event = new Event('keydown');
+        event.key = 'l';
+        event.ctrlKey = true;
+        document.dispatchEvent(event);
+    }
+});
+</script>
+""", unsafe_allow_html=True)
+
+
+# Simple keyboard shortcut to trigger login
+if st.session_state.get('trigger_login', False):
     st.session_state.show_login_form = True
-    st.query_params.clear()
+    st.session_state.trigger_login = False
 
 
 # Show optional login form when triggered
@@ -245,7 +265,7 @@ else:
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview", use_container_width=True):
-            st.session_state.page = 'ient'
+            st.session_state.page = 'interview'
             st.rerun()
 
 
@@ -303,6 +323,13 @@ else:
             {response}
         </div>
         """, unsafe_allow_html=True)
+
+
+# Simple trigger for login - use a hidden button that can be triggered
+if not st.session_state.logged_in:
+    if st.button("Hidden Login Trigger", key="hidden_login", help="login"):
+        st.session_state.show_login_form = True
+        st.rerun()
 
 
 st.markdown('</div>', unsafe_allow_html=True)
