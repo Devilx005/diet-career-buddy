@@ -4,155 +4,75 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# PERFECT CSS - No left gap, proper button spacing, clean content
+# SIMPLE SAFE CSS - Just the essentials
 st.markdown("""
 <style>
-    /* COMPLETE removal of ALL Streamlit containers */
     .main .block-container { 
-        padding: 0rem !important; 
-        margin: 0rem !important;
-        max-width: 100% !important;
-        width: 100vw !important;
-        position: relative;
-        left: 0;
-        right: 0;
+        padding-top: 0rem !important; 
+        padding-left: 1rem !important; 
+        padding-right: 1rem !important; 
+        margin-top: 0rem !important;
     }
     .stApp > header { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     .stDeployButton { display: none !important; }
     section[data-testid="stSidebar"] { display: none !important; }
     
-    /* FORCE full width from absolute edge */
-    body { 
-        background: #212121 !important; 
-        color: white !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        width: 100vw !important;
-        overflow-x: hidden !important;
-    }
-    .stApp { 
-        background: #212121 !important; 
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100vw !important;
-        position: relative;
-        left: 0;
-    }
+    body { background: #212121 !important; color: white !important; }
+    .stApp { background: #212121 !important; }
     
-    /* Remove ALL Streamlit gaps */
-    div[data-testid="stVerticalBlock"] { 
-        gap: 0rem !important; 
-        margin: 0rem !important;
-        padding: 0rem !important;
-        width: 100% !important;
-    }
-    div[data-testid="stHorizontalBlock"] { 
-        gap: 0rem !important; 
-        margin: 0rem !important;
-        padding: 0rem !important;
-        width: 100% !important;
-    }
-    .element-container { 
-        margin: 0rem !important; 
-        padding: 0rem !important; 
-        width: 100% !important;
-    }
-    
-    /* BUTTON GRID - Proper spacing, no overlap */
-    .stColumns { 
-        gap: 8px !important; 
-        margin: 0rem !important; 
-        padding: 0rem 15px !important;
-        width: 100% !important;
-        display: flex !important;
-    }
-    .stColumn { 
-        padding: 0rem !important; 
-        margin: 0rem !important; 
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        max-width: none !important;
-    }
-    
-    /* HEADER - Full width */
     .header { 
         background: linear-gradient(135deg, #303030, #424242); 
-        padding: 18px 0; 
+        padding: 15px; 
         text-align: center; 
         font-weight: bold; 
         border-bottom: 3px solid #10a37f; 
-        font-size: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        margin: 0;
-        width: 100vw;
+        font-size: 18px;
+        margin: 0 -1rem 1rem -1rem;
     }
     
-    /* BUTTONS - Perfect sizing */
     .stButton > button { 
         background: linear-gradient(135deg, #424242, #525252) !important; 
         color: white !important; 
         border: 1px solid #555 !important; 
         width: 100% !important;
-        height: 65px !important;
+        height: 60px !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
-        font-size: 11px !important;
+        font-size: 10px !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
-        margin: 0 !important;
-        padding: 5px !important;
-        line-height: 1.1 !important;
+        margin: 2px !important;
     }
     
     .stButton > button:hover { 
         background: linear-gradient(135deg, #10a37f, #0d8f6b) !important; 
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 18px rgba(16, 163, 127, 0.4) !important;
-    }
-    
-    /* CONTENT - Full width, no left gap */
-    .main-content { 
-        padding: 25px 20px; 
-        background: #212121;
-        margin: 0 !important;
-        width: 100vw;
+        transform: translateY(-1px) !important;
     }
     
     .feature-card {
         background: linear-gradient(135deg, #303030, #424242);
-        padding: 20px;
-        border-radius: 10px;
+        padding: 18px;
+        border-radius: 8px;
         border-left: 4px solid #10a37f;
-        margin: 15px 0;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        margin: 12px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     
     .stTextInput input {
         background: #424242 !important;
         color: white !important;
         border: 1px solid #555 !important;
-        border-radius: 8px !important;
-        padding: 10px !important;
-        width: 100% !important;
+        border-radius: 6px !important;
+        padding: 8px !important;
     }
     
     .stMetric {
         background: linear-gradient(135deg, #303030, #424242) !important;
         border: 1px solid #555 !important;
-        border-radius: 8px !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        border-radius: 6px !important;
+        padding: 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
         margin: 4px !important;
-    }
-    
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-        .stColumns { gap: 4px !important; padding: 0rem 10px !important; }
-        .stButton > button { 
-            font-size: 9px !important; 
-            height: 55px !important; 
-        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -181,10 +101,10 @@ def get_live_job_data():
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# HEADER
+# Header
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# BUTTONS - Properly spaced
+# Navigation Buttons - Simple grid
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -217,9 +137,7 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-# MAIN CONTENT
-st.markdown('<div class="main-content">', unsafe_allow_html=True)
-
+# Content
 if st.session_state.page == 'jobs':
     st.markdown("## 📊 **Live Job Market Dashboard**")
     
@@ -235,15 +153,10 @@ if st.session_state.page == 'jobs':
         st.metric("Last Updated", job_data['updated'], "Real-time")
     
     st.markdown("### 🔥 **Trending Job Categories**")
-    categories = [
-        "💻 **Software Development**: 3,200+ active openings",
-        "📊 **Data Science & Analytics**: 1,800+ positions available",
-        "☁️ **DevOps & Cloud Engineering**: 1,200+ roles",
-        "🤖 **AI/ML Engineering**: 900+ opportunities"
-    ]
-    
-    for category in categories:
-        st.write(f"• {category}")
+    st.write("• **Software Development**: 3,200+ active openings")
+    st.write("• **Data Science & Analytics**: 1,800+ positions available")
+    st.write("• **DevOps & Cloud Engineering**: 1,200+ roles")
+    st.write("• **AI/ML Engineering**: 900+ opportunities")
     
     if st.button("← Back to Home", key="back_jobs"):
         st.session_state.page = 'home'
@@ -272,7 +185,7 @@ elif st.session_state.page == 'salary':
         st.rerun()
 
 else:
-    # CLEAN HOME PAGE - No duplicate sections
+    # Simple Home Page
     st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
     
@@ -282,12 +195,12 @@ else:
         • <strong>Real-Time APIs:</strong> Live job market data from GitHub & CoinGecko<br>
         • <strong>DIET-Specific Guidance:</strong> Tailored advice for engineering students<br>
         • <strong>Interactive Dashboards:</strong> 6 comprehensive career analysis tools<br>
-        • <strong>Edge-to-Edge Design:</strong> Zero gaps, professional interface<br>
+        • <strong>Professional Design:</strong> Clean, modern interface<br>
         • <strong>Market Intelligence:</strong> AI-powered career insights
     </div>
     """, unsafe_allow_html=True)
     
-    # Interactive Chat ONLY - Remove duplicate features
+    # Chat Section
     st.markdown("### 💬 **Ask Your Career Questions!**")
     user_input = st.text_input("💭 What would you like to know about your career?", 
                               placeholder="e.g., What skills do I need for data science?")
@@ -299,10 +212,6 @@ else:
             response += "💰 Check the **Live Salary** dashboard for real-time data!"
         elif any(word in user_input.lower() for word in ['job', 'hiring', 'market']):
             response += "📊 Visit the **Live Jobs** dashboard for market insights!"
-        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course']):
-            response += "📚 Explore the **Learning Paths** dashboard for skill development!"
-        elif any(word in user_input.lower() for word in ['interview', 'preparation']):
-            response += "🎯 Check the **Interview Prep** dashboard for preparation tips!"
         else:
             response += "🎓 Click any dashboard button above for detailed insights!"
         
@@ -312,5 +221,3 @@ else:
             <strong>🎓 Assistant:</strong> {response}
         </div>
         """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
