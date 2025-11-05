@@ -22,7 +22,7 @@ st.set_page_config(
 # Apply CSS
 st.markdown(get_main_css(), unsafe_allow_html=True)
 
-# Enhanced Auth CSS (your existing CSS - keep as is)
+# Enhanced Auth CSS
 st.markdown("""
 <style>
     .auth-modal {
@@ -72,30 +72,6 @@ st.markdown("""
         font-size: 0.95em;
     }
     
-    .auth-toggle {
-        display: flex;
-        background: #333;
-        border-radius: 8px;
-        margin-bottom: 25px;
-        padding: 4px;
-    }
-    
-    .auth-tab {
-        flex: 1;
-        padding: 12px;
-        text-align: center;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        color: #a0aec0;
-    }
-    
-    .auth-tab.active {
-        background: #10a37f;
-        color: white;
-    }
-    
     .divider {
         text-align: center;
         margin: 25px 0;
@@ -132,6 +108,7 @@ st.markdown("""
         color: #10a37f;
         text-decoration: none;
         font-weight: 600;
+        cursor: pointer;
     }
     
     .signup-link a:hover {
@@ -140,7 +117,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Session State (your existing session state - keep as is)
+# Session State
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 if 'username' not in st.session_state:
@@ -149,25 +126,18 @@ if 'page' not in st.session_state:
     st.session_state.page = 'home'
 if 'show_login_modal' not in st.session_state:
     st.session_state.show_login_modal = False
-if 'auth_method' not in st.session_state:
-    st.session_state.auth_method = 'email'
 if 'auth_mode' not in st.session_state:
     st.session_state.auth_mode = 'login'
 
-# Enhanced User Database (your existing database - keep as is)
+# Enhanced User Database
 USER_DB = {
     "emails": {
         "demo@gmail.com": {"password": "demo123", "name": "Demo User"},
         "student@diet.ac.in": {"password": "student123", "name": "DIET Student"},
         "admin@diet.com": {"password": "admin123", "name": "Admin User"}
-    },
-    "phones": {
-        "9876543210": {"name": "Phone User"},
-        "8765432109": {"name": "Test User"}
     }
 }
 
-# Your existing functions (keep as is)
 def authenticate_email(email, password):
     if email in USER_DB["emails"]:
         return USER_DB["emails"][email]["password"] == password, USER_DB["emails"][email]["name"]
@@ -177,10 +147,8 @@ def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
-# Your existing login modal function (keep as is - but remove the function name change)
-def show_real_world_login():
-    """Real-world professional login modal"""
-    # ... keep all your existing modal code here ...
+def show_login_modal():
+    """Professional login modal"""
     st.markdown('<div class="auth-modal">', unsafe_allow_html=True)
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     
@@ -195,7 +163,7 @@ def show_real_world_login():
     # Login/Signup Toggle
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Login", key="signin_tab", use_container_width=True,
+        if st.button("Login", key="login_tab", use_container_width=True,
                     type="primary" if st.session_state.auth_mode == 'login' else "secondary"):
             st.session_state.auth_mode = 'login'
             st.rerun()
@@ -231,11 +199,19 @@ def show_real_world_login():
         # LOGIN FORM
         st.markdown("### 📧 Login")
         
-        email = st.text_input("Email", placeholder="Enter your email address", key="signin_email")
-        password = st.text_input("Password", type="password", placeholder="Enter your password", key="signin_password")
+        email = st.text_input("Email", placeholder="Enter your email address", key="login_email")
+        password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
-        # Sign in button
-        if st.button("🚀 Login", key="signin_submit", use_container_width=True, type="primary"):
+        # Remember me and forgot password
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            remember_me = st.checkbox("Remember me", key="remember")
+        with col2:
+            if st.button("Forgot password?", key="forgot_pass"):
+                st.info("🔄 Password reset link sent to your email!")
+        
+        # Login button
+        if st.button("🚀 Login", key="login_submit", use_container_width=True, type="primary"):
             if not email or not password:
                 st.error("❌ Please fill in all fields!")
             elif not is_valid_email(email):
@@ -254,7 +230,7 @@ def show_real_world_login():
         # Sign up link
         st.markdown("""
         <div class="signup-link">
-            Don't have an account? <a href="#" onclick="document.getElementById('signup_tab').click()">Sign up</a>
+            Don't have an account? <a onclick="changeToSignup()">Sign up</a>
         </div>
         """, unsafe_allow_html=True)
     
@@ -294,7 +270,7 @@ def show_real_world_login():
         # Sign in link
         st.markdown("""
         <div class="signup-link">
-            Already have an account? <a href="#" onclick="document.getElementById('signin_tab').click()">Sign in</a>
+            Already have an account? <a onclick="changeToLogin()">Sign in</a>
         </div>
         """, unsafe_allow_html=True)
     
@@ -304,14 +280,28 @@ def show_real_world_login():
         st.session_state.show_login_modal = False
         st.rerun()
     
+    # JavaScript for link clicks
+    st.markdown("""
+    <script>
+    function changeToSignup() {
+        const signupBtn = parent.document.querySelector('button[data-testid="baseButton-secondary"][key="signup_tab"]');
+        if (signupBtn) signupBtn.click();
+    }
+    function changeToLogin() {
+        const loginBtn = parent.document.querySelector('button[data-testid="baseButton-primary"][key="login_tab"]');
+        if (loginBtn) loginBtn.click();
+    }
+    </script>
+    """, unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# FIXED HEADER - Clean with Login button
+# HEADER with FUNCTIONAL Login Button
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) window.location.reload()">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" title="Click to logout">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
@@ -319,7 +309,7 @@ else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button onclick="window.showLogin=true; setTimeout(() => window.location.reload(), 100)" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <button id="login-btn-header" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
     </div>'''
 
 st.markdown(f"""
@@ -345,16 +335,86 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Check for login trigger
-if st.query_params.get("login") == "1" or 'showLogin' in st.query_params:
+# ✅ HIDDEN TRIGGER BUTTON (this makes the Login button work)
+if st.button("Trigger Login", key="login_trigger", help="Hidden trigger"):
     st.session_state.show_login_modal = True
+    st.rerun()
+
+# ✅ HIDDEN LOGOUT BUTTON (for user menu)
+if st.button("Trigger Logout", key="logout_trigger", help="Hidden logout"):
+    if st.session_state.authenticated:
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.session_state.page = 'home'
+        st.session_state.show_login_modal = False
+        st.rerun()
+
+# ✅ JAVASCRIPT TO MAKE LOGIN BUTTON WORK
+st.markdown("""
+<script>
+// Wait for page to load
+setTimeout(function() {
+    // Find the Login button in header
+    const loginBtn = parent.document.getElementById('login-btn-header');
+    
+    // Find the hidden trigger button
+    const triggerBtns = parent.document.querySelectorAll('button');
+    let triggerBtn = null;
+    
+    triggerBtns.forEach(btn => {
+        if (btn.title === 'Hidden trigger') {
+            triggerBtn = btn;
+        }
+    });
+    
+    // Connect header Login button to trigger
+    if (loginBtn && triggerBtn) {
+        loginBtn.onclick = function() {
+            triggerBtn.click();
+        };
+    }
+    
+    // Handle user menu logout
+    const userDiv = parent.document.querySelector('div[title="Click to logout"]');
+    if (userDiv) {
+        let logoutBtn = null;
+        triggerBtns.forEach(btn => {
+            if (btn.title === 'Hidden logout') {
+                logoutBtn = btn;
+            }
+        });
+        
+        if (logoutBtn) {
+            userDiv.onclick = function() {
+                if (confirm('Sign out?')) {
+                    logoutBtn.click();
+                }
+            };
+        }
+    }
+}, 1000);
+</script>
+""", unsafe_allow_html=True)
+
+# CSS to hide the trigger buttons
+st.markdown("""
+<style>
+    button[title="Hidden trigger"], 
+    button[title="Hidden logout"] {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
-    show_real_world_login()
+    show_login_modal()
     st.stop()
 
-# Dashboard Routing (keep your existing routing code)
+# Dashboard Routing (keep your existing routing)
 if st.session_state.page == 'tech':
     tech_dashboard.show()
     if st.button("🏠 Back to Home", key="back_tech"):
@@ -392,7 +452,7 @@ elif st.session_state.page == 'jobs':
         st.rerun()
 
 else:
-    # HOME PAGE (keep your existing home page code)
+    # HOME PAGE (keep your existing home page)
     welcome_text = f"Welcome back, {st.session_state.username}!" if st.session_state.authenticated else "Welcome to DIET Career Buddy!"
     
     st.markdown(f"## 🎓 **{welcome_text}**")
@@ -470,7 +530,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Chat Section (keep your existing chat section)
+    # Chat Section (keep your existing chat)
     st.markdown("### 💬 **Ask Your Career Questions!**")
     
     col_input, col_button = st.columns([4, 1])
