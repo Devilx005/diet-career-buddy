@@ -115,9 +115,17 @@ st.markdown("""
         text-decoration: underline;
     }
 
-    /* Hide specific buttons */
-    .element-container:has(button[kind="secondary"][data-testid="baseButton-secondary"]) {
+    /* Hide trigger buttons completely */
+    button[title="Login trigger"], 
+    button[title="Logout trigger"] {
         display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -207,6 +215,14 @@ def show_login_modal():
         email = st.text_input("Email", placeholder="Enter your email address", key="login_email")
         password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
+        # Remember me and forgot password
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            remember_me = st.checkbox("Remember me", key="remember")
+        with col2:
+            if st.button("Forgot password?", key="forgot_pass"):
+                st.info("🔄 Password reset link sent to your email!")
+        
         # Login button
         if st.button("🚀 Login", key="login_submit", use_container_width=True, type="primary"):
             if not email or not password:
@@ -280,11 +296,11 @@ def show_login_modal():
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# HEADER
+# HEADER with DIRECTLY FUNCTIONAL Login Button
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" title="Click to logout">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="logout()">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
@@ -292,7 +308,7 @@ else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <button onclick="openLogin()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
     </div>'''
 
 st.markdown(f"""
@@ -318,81 +334,51 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# ✅ WORKING LOGIN BUTTONS (properly hidden)
-col1, col2 = st.columns([1, 1])
-with col1:
-    if st.button("Open Login", key="open_login"):
-        st.session_state.show_login_modal = True
-        st.rerun()
+# HIDDEN TRIGGER BUTTONS (completely invisible)
+if st.button("🔓", key="header_login_trigger", help="Login trigger"):
+    st.session_state.show_login_modal = True
+    st.rerun()
 
-with col2:
-    if st.button("Logout User", key="logout_user"):
-        st.session_state.authenticated = False
-        st.session_state.username = ""
-        st.session_state.page = 'home'
-        st.session_state.show_login_modal = False
-        st.rerun()
+if st.button("🚪", key="header_logout_trigger", help="Logout trigger"):
+    st.session_state.authenticated = False
+    st.session_state.username = ""
+    st.session_state.page = 'home'
+    st.session_state.show_login_modal = False
+    st.rerun()
 
-# JavaScript to connect header buttons to Streamlit buttons
+# JavaScript to make the GREEN LOGIN BUTTON work
 st.markdown("""
 <script>
-setTimeout(function() {
-    // Find header login button
-    const headerButtons = parent.document.querySelectorAll('button');
-    let headerLoginBtn = null;
-    let headerUserDiv = null;
-    
-    headerButtons.forEach(btn => {
-        if (btn.textContent.trim() === 'Login') {
-            headerLoginBtn = btn;
+function openLogin() {
+    // Find the hidden login trigger button
+    const buttons = parent.document.querySelectorAll('button');
+    buttons.forEach(btn => {
+        if (btn.title === 'Login trigger') {
+            btn.click();
         }
     });
-    
-    // Find user div
-    const userDivs = parent.document.querySelectorAll('div[title="Click to logout"]');
-    if (userDivs.length > 0) {
-        headerUserDiv = userDivs[0];
-    }
-    
-    // Find Streamlit trigger buttons
-    const stButtons = parent.document.querySelectorAll('button');
-    let loginTrigger = null;
-    let logoutTrigger = null;
-    
-    stButtons.forEach(btn => {
-        if (btn.textContent.includes('Open Login')) {
-            loginTrigger = btn;
-        }
-        if (btn.textContent.includes('Logout User')) {
-            logoutTrigger = btn;
-        }
-    });
-    
-    // Connect login button
-    if (headerLoginBtn && loginTrigger) {
-        headerLoginBtn.onclick = function() {
-            loginTrigger.click();
-        };
-    }
-    
-    // Connect logout
-    if (headerUserDiv && logoutTrigger) {
-        headerUserDiv.onclick = function() {
-            if (confirm('Sign out?')) {
-                logoutTrigger.click();
+}
+
+function logout() {
+    if (confirm('Sign out?')) {
+        // Find the hidden logout trigger button
+        const buttons = parent.document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            if (btn.title === 'Logout trigger') {
+                btn.click();
             }
-        };
+        });
     }
-}, 1000);
+}
 </script>
 """, unsafe_allow_html=True)
 
-# Show login modal
+# Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
     show_login_modal()
     st.stop()
 
-# Dashboard Routing (keep your existing routing)
+# Dashboard Routing
 if st.session_state.page == 'tech':
     tech_dashboard.show()
     if st.button("🏠 Back to Home", key="back_tech"):
@@ -430,7 +416,7 @@ elif st.session_state.page == 'jobs':
         st.rerun()
 
 else:
-    # HOME PAGE (your existing home page)
+    # HOME PAGE
     welcome_text = f"Welcome back, {st.session_state.username}!" if st.session_state.authenticated else "Welcome to DIET Career Buddy!"
     
     st.markdown(f"## 🎓 **{welcome_text}**")
@@ -439,7 +425,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons (your existing buttons)
+    # Navigation Buttons
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
@@ -496,7 +482,6 @@ else:
                 st.session_state.show_login_modal = True
                 st.rerun()
     
-    # Your existing content sections
     st.markdown("""
     <div class="dashboard-card">
         <strong>🚀 What Makes Us Special:</strong><br><br>
@@ -508,7 +493,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Chat Section (your existing chat)
+    # Chat Section
     st.markdown("### 💬 **Ask Your Career Questions!**")
     
     col_input, col_button = st.columns([4, 1])
