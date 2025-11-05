@@ -149,7 +149,7 @@ def show_login_modal():
     - 👨‍💼 admin@diet.com / admin123
     """)
 
-# HEADER WITH BUILT-IN GREEN LOGIN BUTTON
+# HEADER WITH WORKING GREEN LOGIN BUTTON
 if st.session_state.authenticated:
     header_html = f'''
     <div style="
@@ -191,7 +191,7 @@ else:
         <div style="width: 40px;"></div>
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
         <div style="width: 200px; text-align: right;">
-            <button onclick="triggerLogin()" style="
+            <button id="headerLoginBtn" style="
                 background: #10a37f !important;
                 color: white !important;
                 border: none !important;
@@ -206,15 +206,6 @@ else:
                onmouseout="this.style.background='#10a37f'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(16, 163, 127, 0.3)'">Login</button>
         </div>
     </div>
-    
-    <script>
-    function triggerLogin() {
-        // Set URL parameter to trigger login
-        const url = new URL(window.location.href);
-        url.searchParams.set('login_trigger', '1');
-        window.location.href = url.toString();
-    }
-    </script>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
@@ -222,11 +213,57 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Handle login trigger from URL parameter
-if st.query_params.get("login_trigger") == "1":
-    st.session_state.show_login_modal = True
-    st.query_params.clear()
-    st.rerun()
+# Hidden functional button for login
+if not st.session_state.authenticated:
+    # This invisible button provides the actual Streamlit functionality
+    login_clicked = st.button("🔐", key="hidden_login_trigger", help="Hidden login trigger")
+    
+    if login_clicked:
+        st.session_state.show_login_modal = True
+        st.rerun()
+    
+    # JavaScript to connect header button to hidden button
+    st.markdown("""
+    <script>
+    // Wait for page to load, then connect the header button
+    setTimeout(function() {
+        const headerBtn = document.getElementById('headerLoginBtn');
+        if (headerBtn) {
+            headerBtn.addEventListener('click', function() {
+                // Find and click the hidden Streamlit button
+                const buttons = parent.document.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.title === 'Hidden login trigger' || btn.textContent.includes('🔐')) {
+                        btn.click();
+                    }
+                });
+            });
+        }
+    }, 1000);
+    </script>
+    
+    <style>
+    /* Hide the trigger button completely */
+    button[title="Hidden login trigger"],
+    button:contains("🔐") {
+        display: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+    }
+    
+    /* Also hide its container */
+    .element-container:has(button[title="Hidden login trigger"]) {
+        display: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        visibility: hidden !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
