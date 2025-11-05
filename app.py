@@ -4,89 +4,512 @@ import json
 from datetime import datetime
 import pandas as pd
 
-# Enhanced page configuration for deployment
+# Enhanced page configuration for ChatGPT-style deployment
 st.set_page_config(
-    page_title="🎓 DIET Career Buddy - AI Career Guidance", 
+    page_title="🎓 DIET Career Buddy - ChatGPT Style", 
     page_icon="🎓",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# Modern CSS styling for mobile + cloud
+# ChatGPT-Style CSS and Mobile Interface
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    html, body, [class*="css"] {
+    * {
         font-family: 'Inter', sans-serif;
     }
     
-    .main-header {
-        background: linear-gradient(135deg, #FF8C00 0%, #FF6B35 50%, #FF4500 100%);
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(255, 140, 0, 0.3);
+    /* Hide default Streamlit elements */
+    .stDeployButton {display: none;}
+    header[data-testid="stHeader"] {display: none;}
+    .stMainBlockContainer {padding: 0 !important;}
+    .main .block-container {padding: 0 !important; max-width: 100% !important;}
+    section[data-testid="stSidebar"] {display: none;}
+    
+    /* ChatGPT-style color scheme */
+    :root {
+        --bg-primary: #212121;
+        --bg-secondary: #303030;
+        --bg-chat: #424242;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --accent: #10a37f;
+        --accent-hover: #0d8f6b;
+        --border: #4a4a4a;
     }
     
-    .feature-card {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        border-left: 5px solid #FF8C00;
-        margin: 1rem 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* Main layout */
+    .chat-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-primary);
+        color: var(--text-primary);
     }
     
-    .stButton > button {
-        background: linear-gradient(135deg, #FF8C00, #FF6B35);
+    /* Header */
+    .chat-header {
+        background: var(--bg-secondary);
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background 0.2s;
+    }
+    
+    .header-btn:hover {
+        background: rgba(255,255,255,0.1);
+    }
+    
+    .app-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    /* Sidebar */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 200;
+        display: none;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -320px;
+        width: 300px;
+        height: 100%;
+        background: var(--bg-secondary);
+        transition: left 0.3s ease;
+        z-index: 300;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--border);
+    }
+    
+    .sidebar.open {
+        left: 0;
+    }
+    
+    .sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .sidebar-title {
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .close-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.25rem;
+    }
+    
+    .sidebar-content {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+    
+    .new-chat-btn {
+        background: var(--accent);
         color: white;
         border: none;
-        border-radius: 25px;
-        padding: 0.75rem 2rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    
+    .new-chat-btn:hover {
+        background: var(--accent-hover);
+    }
+    
+    .section-title {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
         font-weight: 600;
-        transition: all 0.3s ease;
+        text-transform: uppercase;
+        margin: 1.5rem 0 0.5rem 0;
+        letter-spacing: 0.5px;
     }
     
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
+    .chat-history-item {
+        padding: 0.75rem;
+        margin: 0.25rem 0;
+        background: var(--bg-chat);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
     }
     
-    /* Mobile optimizations */
+    .chat-history-item:hover {
+        border-color: var(--border);
+        background: #4a4a4a;
+    }
+    
+    .chat-title {
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .chat-preview {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        line-height: 1.3;
+    }
+    
+    /* Login section */
+    .login-section {
+        border-top: 1px solid var(--border);
+        padding-top: 1rem;
+    }
+    
+    .login-form {
+        margin-bottom: 1rem;
+    }
+    
+    .login-input {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        background: var(--bg-chat);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        font-size: 14px;
+        outline: none;
+    }
+    
+    .login-input:focus {
+        border-color: var(--accent);
+    }
+    
+    .login-btn {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        cursor: pointer;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .login-btn:hover {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .user-profile {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: var(--bg-chat);
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .username {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .user-plan {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+    
+    .demo-accounts {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: var(--bg-chat);
+        border-radius: 0.5rem;
+    }
+    
+    .demo-title {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .demo-list {
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: var(--accent);
+    }
+    
+    /* Messages area */
+    .messages-area {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        background: var(--bg-primary);
+    }
+    
+    .message-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .message {
+        margin: 1.5rem 0;
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    
+    .user-avatar {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .assistant-avatar {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+    
+    .message-content {
+        flex: 1;
+        padding-top: 0.25rem;
+    }
+    
+    .message-text {
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+    
+    /* Input area */
+    .input-area {
+        padding: 1rem;
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border);
+    }
+    
+    .input-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .chat-input {
+        width: 100%;
+        padding: 1rem 3rem 1rem 1rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 16px;
+        outline: none;
+        resize: none;
+        min-height: 24px;
+        max-height: 200px;
+    }
+    
+    .chat-input:focus {
+        border-color: var(--accent);
+    }
+    
+    .send-btn {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--accent);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    
+    .send-btn:hover {
+        background: var(--accent-hover);
+    }
+    
+    .send-btn:disabled {
+        background: var(--text-secondary);
+        cursor: not-allowed;
+    }
+    
+    /* Quick actions */
+    .quick-actions {
+        padding: 0.5rem 1rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+    }
+    
+    .quick-actions-row {
+        display: flex;
+        gap: 0.5rem;
+        min-width: max-content;
+    }
+    
+    .quick-action-btn {
+        background: var(--bg-chat);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+    
+    .quick-action-btn:hover {
+        border-color: var(--accent);
+        background: var(--accent);
+    }
+    
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .main .block-container {
-            padding: 1rem 0.5rem;
+        .sidebar {
+            width: 85%;
         }
         
-        .stTextInput > div > div > input {
-            font-size: 16px !important;
+        .message {
+            gap: 0.75rem;
         }
         
-        .stButton > button {
-            width: 100%;
+        .message-avatar {
+            width: 28px;
+            height: 28px;
         }
         
-        .main-header h1 {
-            font-size: 2rem !important;
+        .chat-input {
+            font-size: 16px;
+            padding: 0.875rem 3rem 0.875rem 1rem;
         }
     }
     
-    /* Hide Streamlit elements */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--bg-primary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+    }
 </style>
 
-<!-- PWA Meta Tags -->
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#FF8C00">
+<script>
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+    } else {
+        sidebar.classList.add('open');
+        overlay.style.display = 'block';
+    }
+}
+
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.querySelector('.sidebar-overlay').style.display = 'none';
+}
+
+function newChat() {
+    closeSidebar();
+    // This will be handled by Streamlit
+    document.getElementById('new-chat-trigger').click();
+}
+
+function quickAction(action) {
+    const input = document.querySelector('.chat-input');
+    input.value = action;
+    input.focus();
+}
+</script>
 """, unsafe_allow_html=True)
 
-# =================== USER DATA MANAGEMENT (Cloud Compatible) ===================
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+# =================== USER DATA MANAGEMENT ===================
+@st.cache_data(ttl=3600)
 def load_user_data():
     """Load users - using session state for cloud deployment"""
     if 'user_database' not in st.session_state:
@@ -150,7 +573,7 @@ def get_enhanced_career_response(user_message, username=None):
     greeting = f"Hi {username}! " if username else "Hello! "
     
     if any(word in msg for word in ['hello', 'hi', 'hey', 'start']):
-        return f"""{greeting}🎓 **Welcome to DIET Career Buddy - Cloud Edition!**
+        return f"""{greeting}🎓 **Welcome to DIET Career Buddy - ChatGPT Edition!**
 
 I'm your AI-powered career assistant! Here's how I can help:
 
@@ -298,54 +721,6 @@ Want salary info for specific roles? 💼"""
 
 Which skill area interests you most? 🚀"""
 
-    elif any(word in msg for word in ['interview', 'job', 'placement', 'company']):
-        return """🎯 **Interview & Job Search Guide for DIET Students**
-
-**📍 Best Job Search Platforms:**
-• **LinkedIn**: Professional networking + direct applications
-• **Naukri.com**: Traditional Indian job portal
-• **AngelList**: Startup opportunities with equity
-• **Company websites**: Direct career page applications
-• **Referrals**: Most effective method (70% success rate)
-
-**📋 Application Essentials:**
-• **ATS-Optimized Resume**: Keywords matching job requirements
-• **GitHub Portfolio**: 4-5 quality projects with documentation
-• **LinkedIn Profile**: Professional summary + recommendations
-• **Cover Letter**: Personalized for each application
-
-**🧠 Technical Interview Prep:**
-• **Data Structures**: Arrays, LinkedLists, Trees, Graphs
-• **Algorithms**: Sorting, Searching, Dynamic Programming
-• **System Design**: Basic scalability concepts (senior roles)
-• **Coding Practice**: LeetCode (Easy→Medium), HackerRank
-
-**🗣️ Behavioral Interview (STAR Method):**
-• **Situation**: Set the context
-• **Task**: Explain your responsibility
-• **Action**: Detail what you did
-• **Result**: Share the positive outcome
-
-**📅 DIET Placement Timeline:**
-• **Pre-Final Year**: Build skills, complete internships
-• **Final Year (July-Aug)**: Resume prep, company applications
-• **Sep-Nov**: Peak placement season
-• **Dec-Feb**: Off-campus applications, startup opportunities
-
-**🎓 DIET Advantages to Highlight:**
-• Strong engineering fundamentals from rigorous curriculum
-• Hands-on project experience from lab sessions
-• Problem-solving mindset from technical courses
-• Team collaboration from group projects
-
-**💡 Interview Success Tips:**
-• Research company culture and recent news
-• Practice explaining technical projects clearly
-• Prepare thoughtful questions about the role
-• Show enthusiasm for learning and growth
-
-Need specific prep for any company or role? 💪"""
-
     elif any(word in msg for word in ['diet', 'college', 'dnyanshree', 'placement']):
         return """🎓 **Career Excellence Guide for DIET Students**
 
@@ -385,38 +760,12 @@ Need specific prep for any company or role? 💪"""
 • **Growing Startup Ecosystem**: Local entrepreneur network
 • **Industry 4.0**: Manufacturing + tech convergence opportunities
 
-**📊 Recent Placement Highlights:**
-• **Overall Success Rate**: 75-85% placement in good academic years
-• **Average Package**: ₹4-6 LPA across engineering branches
-• **Top Packages**: ₹15-25 LPA for exceptional performers
-• **Diverse Sectors**: IT services, product companies, fintech, consulting
-
-**💡 Career Growth Strategy:**
-• **Year 1-2**: Focus on learning and skill building (₹3.5-8 LPA)
-• **Year 3-5**: Specialization and leadership roles (₹8-20 LPA)
-• **Year 5+**: Senior positions, possible entrepreneurship (₹20-50+ LPA)
-
-**🤝 Alumni Network Benefits:**
-• **Referral Opportunities**: Direct connections in target companies
-• **Career Mentorship**: Guidance from industry professionals
-• **Industry Insights**: Real-world perspectives on career paths
-• **Networking Events**: Professional connections and opportunities
-
-**🚀 Next Steps for Success:**
-1. **Assess Current Skills**: Identify strengths and improvement areas
-2. **Choose Specialization**: Web Dev, Data Science, Mobile, or Cloud
-3. **Build Portfolio**: Create impressive projects showcasing skills
-4. **Practice Interviews**: Technical and behavioral preparation
-5. **Network Actively**: Connect with alumni and industry professionals
-
-**You're from DIET - you have the foundation for a successful tech career!** 🌟
-
 What specific aspect would you like to focus on? 🎯"""
 
     else:
         return f"""Thanks for asking: "{user_message}" 🤔
 
-I'm your enhanced DIET Career AI Assistant running in the cloud! I can help with:
+I'm your enhanced DIET Career AI Assistant! I can help with:
 
 **💼 Career Exploration:**
 • Technology roles (Software, Data Science, AI/ML, DevOps, Mobile)
@@ -452,14 +801,12 @@ def smart_ai_response(user_message, username=None):
     """Main AI response function"""
     return get_enhanced_career_response(user_message, username)
 
-# =================== MAIN APPLICATION ===================
-
-# Initialize session state
+# =================== INITIALIZE SESSION STATE ===================
 if 'messages' not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant", 
-            "content": "🎓 Hello! I'm your DIET Career Assistant powered by cloud AI. I can help with career guidance, salary insights, job market trends, and skill development. 💡 **Tip:** Login to save your chat history!"
+            "content": "🎓 Hello! I'm your DIET Career Assistant. I can help with career guidance, salary insights, job market trends, and skill development. What would you like to explore today?"
         }
     ]
 
@@ -469,221 +816,210 @@ if 'logged_in' not in st.session_state:
 if 'current_user' not in st.session_state:
     st.session_state.current_user = None
 
+if 'chat_histories' not in st.session_state:
+    st.session_state.chat_histories = {
+        "Tech Career Planning": ["What are the best tech careers?", "How to become a data scientist?"],
+        "Salary Research": ["Software developer salaries", "FAANG compensation"],
+        "Interview Prep": ["Common interview questions", "How to prepare for coding interviews"],
+        "DIET Guidance": ["College placement tips", "Alumni network benefits"],
+        "Learning Roadmaps": ["Python learning path", "Full-stack development guide"]
+    }
+
+if 'show_login_form' not in st.session_state:
+    st.session_state.show_login_form = False
+
+if 'show_register_form' not in st.session_state:
+    st.session_state.show_register_form = False
+
 # Load user data
 load_user_data()
 
-# Main Header
-st.markdown("""
-<div class="main-header">
-    <h1 style="color: white; margin: 0; font-size: 3rem;">🎓 DIET Career Buddy</h1>
-    <h2 style="color: white; margin: 0.5rem 0; font-size: 1.5rem;">Cloud AI Edition</h2>
-    <p style="color: white; margin: 0; font-size: 1.1rem; opacity: 0.9;">
-        Advanced AI Career Guidance • Real-time Market Data • Mobile Optimized
-    </p>
+# =================== MAIN CHATGPT-STYLE INTERFACE ===================
+
+# Main container
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
+# Header
+st.markdown(f"""
+<div class="chat-header">
+    <button class="header-btn" onclick="toggleSidebar()">☰</button>
+    <h1 class="app-title">🎓 DIET Career Buddy</h1>
+    <button class="header-btn" onclick="document.querySelector('.messages-area').scrollTop = 0">↻</button>
 </div>
 """, unsafe_allow_html=True)
 
-# Feature showcase
-col1, col2, col3 = st.columns(3)
+# Quick actions bar
+st.markdown("""
+<div class="quick-actions">
+    <div class="quick-actions-row">
+        <button class="quick-action-btn" onclick="quickAction('What are the best technology careers for 2025?')">💻 Tech Careers</button>
+        <button class="quick-action-btn" onclick="quickAction('Show me tech salary ranges for 2025')">💰 Salaries</button>
+        <button class="quick-action-btn" onclick="quickAction('Create a skill development roadmap')">📚 Learning</button>
+        <button class="quick-action-btn" onclick="quickAction('Career guidance for DIET students')">🎓 DIET Guide</button>
+        <button class="quick-action-btn" onclick="quickAction('Interview preparation tips')">🎯 Interviews</button>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-with col1:
-    st.markdown("""
-    <div class="feature-card">
-        <h3>🤖 Cloud AI Engine</h3>
-        <p><strong>Status:</strong> 🟢 Online</p>
-        <p>Advanced AI running in the cloud for intelligent career guidance</p>
+# Sidebar overlay and menu
+st.markdown("""
+<div class="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">Menu</h2>
+        <button class="close-btn" onclick="closeSidebar()">×</button>
+    </div>
+    <div class="sidebar-content">
+        <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
+""", unsafe_allow_html=True)
+
+# Recent chats section
+st.markdown('<div class="section-title">Recent Chats</div>', unsafe_allow_html=True)
+
+for chat_name, messages in st.session_state.chat_histories.items():
+    preview = messages[0][:40] + "..." if messages else "New conversation"
+    st.markdown(f"""
+    <div class="chat-history-item" onclick="closeSidebar()">
+        <div class="chat-title">{chat_name}</div>
+        <div class="chat-preview">{preview}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col2:
+# Login/User section
+st.markdown('<div class="login-section">', unsafe_allow_html=True)
+
+if not st.session_state.logged_in:
+    st.markdown('<div class="section-title">Account</div>', unsafe_allow_html=True)
+    
+    # Login form
+    with st.form("sidebar_login_form"):
+        login_username = st.text_input("Username", key="sidebar_login_user", placeholder="Enter username")
+        login_password = st.text_input("Password", type="password", key="sidebar_login_pass", placeholder="Enter password")
+        login_col1, login_col2 = st.columns(2)
+        
+        with login_col1:
+            login_btn = st.form_submit_button("🚀 Login", use_container_width=True)
+        with login_col2:
+            register_btn = st.form_submit_button("📝 Register", use_container_width=True)
+        
+        if login_btn and login_username and login_password:
+            success, msg = login_user(login_username, login_password)
+            if success:
+                st.session_state.logged_in = True
+                st.session_state.current_user = login_username.lower()
+                saved_history = get_user_chat_history(login_username.lower())
+                if saved_history:
+                    st.session_state.messages = saved_history
+                st.success(f"Welcome back, {login_username}!")
+                st.rerun()
+            else:
+                st.error(msg)
+        
+        if register_btn and login_username and login_password:
+            success, msg = register_user(login_username, login_password)
+            if success:
+                st.success(msg)
+            else:
+                st.error(msg)
+    
+    # Demo accounts
     st.markdown("""
-    <div class="feature-card">
-        <h3>📊 Real-time Data</h3>
-        <p><strong>Status:</strong> 🟢 Active</p>
-        <p>Current job market insights and salary information for 2025</p>
+    <div class="demo-accounts">
+        <div class="demo-title">Demo Accounts</div>
+        <div class="demo-list">
+            • demo / demo123<br>
+            • student / diet123<br>
+            • DIET team: vinayak, prathmesh, satwik, rohan / diet2025
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-with col3:
-    st.markdown("""
-    <div class="feature-card">
-        <h3>🎓 DIET Focused</h3>
-        <p><strong>Status:</strong> 🟢 Specialized</p>
-        <p>Customized guidance for engineering students and tech careers</p>
+else:
+    # Logged in user profile
+    username = st.session_state.current_user
+    st.markdown(f"""
+    <div class="user-profile">
+        <div class="avatar">{username[0].upper()}</div>
+        <div class="user-info">
+            <div class="username">{username.title()}</div>
+            <div class="user-plan">Free Plan • Chat history saved</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    if st.button("🚪 Logout", key="sidebar_logout", use_container_width=True):
+        if st.session_state.current_user and st.session_state.messages:
+            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
+        
+        st.session_state.logged_in = False
+        st.session_state.current_user = None
+        st.session_state.messages = [
+            {"role": "assistant", "content": "Logged out successfully! You're now in guest mode."}
+        ]
+        st.rerun()
 
-# =================== SIDEBAR ===================
-with st.sidebar:
-    st.markdown("### 🎓 DIET Career AI")
-    
-    # Login/Register Section
-    if not st.session_state.logged_in:
-        st.markdown("#### 🔐 Login / Register")
-        
-        tab1, tab2 = st.tabs(["Login", "Register"])
-        
-        with tab1:
-            with st.form("login_form"):
-                login_username = st.text_input("Username", key="login_user")
-                login_password = st.text_input("Password", type="password", key="login_pass")
-                login_btn = st.form_submit_button("🚀 Login")
-                
-                if login_btn and login_username and login_password:
-                    success, msg = login_user(login_username, login_password)
-                    if success:
-                        st.session_state.logged_in = True
-                        st.session_state.current_user = login_username.lower()
-                        # Load saved chat history
-                        saved_history = get_user_chat_history(login_username.lower())
-                        if saved_history:
-                            st.session_state.messages = saved_history
-                        st.success(f"Welcome back, {login_username}! 🎉")
-                        st.rerun()
-                    else:
-                        st.error(msg)
-        
-        with tab2:
-            with st.form("register_form"):
-                reg_username = st.text_input("Choose Username", key="reg_user")
-                reg_password = st.text_input("Choose Password", type="password", key="reg_pass")
-                reg_btn = st.form_submit_button("📝 Register")
-                
-                if reg_btn and reg_username and reg_password:
-                    success, msg = register_user(reg_username, reg_password)
-                    if success:
-                        st.success(msg)
-                    else:
-                        st.error(msg)
-        
-        st.markdown("---")
-        st.markdown("**Demo Accounts:**")
-        st.markdown("• `demo` / `demo123`")
-        st.markdown("• `student` / `diet123`")
-        st.markdown("• DIET team: `vinayak`, `prathmesh`, `satwik`, `rohan` / `diet2025`")
-        
-        st.markdown("---")
-        st.markdown("**🌟 Guest Mode**")
-        st.markdown("✅ Full functionality  \n❌ No chat saving  \n💡 Login to persist chats")
-    
-    else:
-        # Logged in user
-        st.markdown(f"#### 👤 Welcome, {st.session_state.current_user.title()}!")
-        st.markdown("**💾 Status:** Chat history saving automatically")
-        
-        if st.button("🚪 Logout", use_container_width=True):
-            if st.session_state.current_user and st.session_state.messages:
-                save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-            
-            st.session_state.logged_in = False
-            st.session_state.current_user = None
-            st.session_state.messages = [
-                {"role": "assistant", "content": "Logged out successfully! You're now in guest mode. Login to save conversations."}
-            ]
-            st.rerun()
-    
-    st.markdown("---")
-    
-    # Quick Actions
-    st.markdown("### ⚡ **Quick Topics**")
-    
-    if st.button("🚀 Tech Careers", key="tech_quick"):
-        user_msg = "What are the best technology careers for 2025?"
-        st.session_state.messages.append({"role": "user", "content": user_msg})
-        response = smart_ai_response(user_msg, st.session_state.current_user)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        if st.session_state.logged_in:
-            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-        st.rerun()
-    
-    if st.button("💰 Salaries", key="salary_quick"):
-        user_msg = "Show me tech salary ranges for 2025"
-        st.session_state.messages.append({"role": "user", "content": user_msg})
-        response = smart_ai_response(user_msg, st.session_state.current_user)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        if st.session_state.logged_in:
-            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-        st.rerun()
-    
-    if st.button("📚 Learning", key="learn_quick"):
-        user_msg = "Create a skill development roadmap"
-        st.session_state.messages.append({"role": "user", "content": user_msg})
-        response = smart_ai_response(user_msg, st.session_state.current_user)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        if st.session_state.logged_in:
-            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-        st.rerun()
-    
-    if st.button("🎯 DIET Guide", key="diet_quick"):
-        user_msg = "Career guidance for DIET students"
-        st.session_state.messages.append({"role": "user", "content": user_msg})
-        response = smart_ai_response(user_msg, st.session_state.current_user)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        if st.session_state.logged_in:
-            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-        st.rerun()
-    
-    if st.button("🗑️ New Chat", key="new_chat"):
-        if st.session_state.logged_in and st.session_state.current_user:
-            save_user_chat_history(st.session_state.current_user, st.session_state.messages)
-        
-        welcome_msg = f"Hello {st.session_state.current_user.title()}! New chat started. How can I help?" if st.session_state.logged_in else "New chat started! How can I help with your career today?"
-        st.session_state.messages = [{"role": "assistant", "content": welcome_msg}]
-        st.rerun()
-    
-    st.markdown("---")
-    st.markdown("### 👥 **About**")
-    st.markdown("""
-    **DIET Career Buddy**
-    
-    **Enhanced by:**
-    • VINAYAK KHARADE
-    • PRATHMESH SANDIM  
-    • SATWIK TAMBEWAGH
-    • ROHAN SAWANT
-    
-    **Features:**
-    ✅ Cloud AI responses
-    💾 Chat persistence
-    📱 Mobile optimized
-    🎓 DIET specialized
-    """)
+st.markdown('</div></div></div>', unsafe_allow_html=True)  # Close login-section, sidebar-content, sidebar
 
-# =================== CHAT INTERFACE ===================
+# Messages area
+st.markdown('<div class="messages-area"><div class="message-container">', unsafe_allow_html=True)
 
-# Status indicator
-status = "🟢 Logged in" if st.session_state.logged_in else "🔵 Guest Mode"
-st.markdown(f"**Status:** {status} {'(Chats saving)' if st.session_state.logged_in else '(Chats not saved)'}")
-
-# Display messages
 for i, msg in enumerate(st.session_state.messages):
     if msg["role"] == "user":
-        message(msg["content"], is_user=True, key=f"user_{i}")
+        st.markdown(f"""
+        <div class="message">
+            <div class="message-avatar user-avatar">You</div>
+            <div class="message-content">
+                <div class="message-text">{msg["content"]}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        message(msg["content"], key=f"bot_{i}")
+        st.markdown(f"""
+        <div class="message">
+            <div class="message-avatar assistant-avatar">🎓</div>
+            <div class="message-content">
+                <div class="message-text">{msg["content"]}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-# Chat input
-st.markdown("---")
-with st.form(key='chat_form', clear_on_submit=True):
-    col1, col2 = st.columns([4, 1])
+st.markdown('</div></div>', unsafe_allow_html=True)  # Close message-container and messages-area
+
+# Input area
+st.markdown('<div class="input-area"><div class="input-container">', unsafe_allow_html=True)
+
+# Hidden button for new chat functionality
+if st.button("New Chat", key="new_chat_trigger", type="primary"):
+    if st.session_state.logged_in and st.session_state.current_user:
+        save_user_chat_history(st.session_state.current_user, st.session_state.messages)
     
-    with col1:
-        user_input = st.text_input(
-            "Ask me about careers, skills, salaries, or job trends...",
-            key="user_input",
-            placeholder="💭 Example: 'What skills do I need for data science?'"
-        )
+    current_time = datetime.now().strftime("%H:%M")
+    st.session_state.messages = [
+        {"role": "assistant", "content": f"New chat started! How can I help you with your career today?"}
+    ]
+    st.rerun()
+
+# Chat input form
+with st.form(key='chatgpt_chat_form', clear_on_submit=True):
+    user_input = st.text_area(
+        "",
+        placeholder="Ask about careers, skills, salaries, or job market trends...",
+        key="chatgpt_chat_input",
+        height=50,
+        label_visibility="collapsed"
+    )
     
-    with col2:
-        send_button = st.form_submit_button("Send 🚀")
+    submit = st.form_submit_button("Send", use_container_width=True)
+
+st.markdown('</div></div>', unsafe_allow_html=True)  # Close input-container and input-area
 
 # Process input
-if send_button and user_input:
+if submit and user_input:
     # Add user message
     st.session_state.messages.append({"role": "user", "content": user_input})
     
     # Generate response
-    with st.spinner("🤖 Generating response..."):
+    with st.spinner("🤖 Thinking..."):
         bot_response = smart_ai_response(user_input, st.session_state.current_user)
     
     # Add bot response
@@ -695,12 +1031,11 @@ if send_button and user_input:
     
     st.rerun()
 
-# Footer
-st.markdown("---")
+st.markdown('</div>', unsafe_allow_html=True)  # Close main chat-container
+
+# Footer info
 st.markdown("""
-<div style='text-align: center; color: #666666; font-size: 14px;'>
-    <p><strong>🎓 DIET Career Buddy - Cloud AI Edition</strong></p>
-    <p>Enhanced AI Career Guidance • Mobile Optimized • Built by DIET Students</p>
-    <p>Dnyanshree Institute of Engineering & Technology | 2025</p>
+<div style="position: fixed; bottom: 0; right: 0; padding: 0.5rem; background: rgba(33, 33, 33, 0.9); border-radius: 0.5rem 0 0 0; font-size: 0.7rem; color: #b0b0b0;">
+    DIET Career Buddy • Enhanced by VINAYAK, PRATHMESH, SATWIK, ROHAN
 </div>
 """, unsafe_allow_html=True)
