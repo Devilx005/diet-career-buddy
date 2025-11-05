@@ -50,11 +50,6 @@ def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
-# LOGIN TRIGGER METHOD
-def handle_login_trigger():
-    """Method to handle login button click and show login modal"""
-    st.session_state.show_login_modal = True
-
 # Login Modal Function
 def show_login_modal():
     st.markdown("""
@@ -154,7 +149,7 @@ def show_login_modal():
     - 👨‍💼 admin@diet.com / admin123
     """)
 
-# HEADER WITH WORKING GREEN LOGIN BUTTON
+# HEADER WITH NON-FUNCTIONAL GREEN LOGIN BUTTON (VISUAL ONLY)
 if st.session_state.authenticated:
     header_html = f'''
     <div style="
@@ -196,7 +191,7 @@ else:
         <div style="width: 40px;"></div>
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
         <div style="width: 200px; text-align: right;">
-            <button id="headerLoginBtn" style="
+            <button style="
                 background: #10a37f !important;
                 color: white !important;
                 border: none !important;
@@ -208,7 +203,8 @@ else:
                 transition: all 0.3s ease !important;
                 box-shadow: 0 2px 8px rgba(16, 163, 127, 0.3) !important;
             " onmouseover="this.style.background='#0d8f6b'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 163, 127, 0.4)'" 
-               onmouseout="this.style.background='#10a37f'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(16, 163, 127, 0.3)'">Login</button>
+               onmouseout="this.style.background='#10a37f'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(16, 163, 127, 0.3)'"
+               onclick="alert('Login functionality disabled for testing')">Login</button>
         </div>
     </div>
     '''
@@ -218,106 +214,9 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# HIDDEN LOGIN TRIGGER - PLACED RIGHT NEAR LOGIN BUTTON SECTION
-if not st.session_state.authenticated:
-    
-    # Hidden login trigger positioned near the top of the page
-    st.markdown("""
-    <div style="position: absolute; top: -1000px; left: -1000px; width: 1px; height: 1px; opacity: 0; visibility: hidden;">
-    """, unsafe_allow_html=True)
-    
-    # The actual hidden trigger button with method
-    if st.button("🔐 LOGIN_TRIGGER", key="hidden_login_trigger_btn", on_click=handle_login_trigger, help="Hidden login trigger button"):
-        # This will never be reached since on_click handles it
-        pass
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # JavaScript to connect header login button to hidden trigger
-    st.markdown("""
-    <script>
-    // Function to trigger login
-    function triggerLogin() {
-        console.log('Triggering login...');
-        
-        // Find the hidden login trigger button
-        const buttons = parent.document.querySelectorAll('button');
-        let hiddenBtn = null;
-        
-        buttons.forEach(btn => {
-            if (btn.textContent && btn.textContent.includes('LOGIN_TRIGGER')) {
-                hiddenBtn = btn;
-            }
-        });
-        
-        if (hiddenBtn) {
-            console.log('Found hidden button, clicking...');
-            hiddenBtn.click();
-        } else {
-            console.log('Hidden button not found');
-        }
-    }
-    
-    // Wait for page load and connect the header button
-    setTimeout(function() {
-        const headerBtn = document.getElementById('headerLoginBtn');
-        if (headerBtn) {
-            console.log('Header login button found, adding event listener...');
-            
-            // Remove any existing listeners and add new one
-            headerBtn.replaceWith(headerBtn.cloneNode(true));
-            const newHeaderBtn = document.getElementById('headerLoginBtn');
-            
-            newHeaderBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Header login button clicked');
-                triggerLogin();
-                return false;
-            });
-        } else {
-            console.log('Header login button not found');
-        }
-    }, 1500);
-    </script>
-    
-    <style>
-    /* Hide the login trigger button completely */
-    button:contains("LOGIN_TRIGGER"),
-    button[title="Hidden login trigger button"] {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-        z-index: -9999 !important;
-    }
-    
-    /* Hide container of hidden button */
-    .element-container:has(button:contains("LOGIN_TRIGGER")) {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-    }
-    
-    /* Ensure header login button is always visible */
-    #headerLoginBtn {
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        z-index: 1000 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# NO HIDDEN LOGIN TRIGGER - COMPLETELY REMOVED
 
-# Show login modal when triggered
+# Show login modal when triggered (but no trigger exists now)
 if st.session_state.show_login_modal and not st.session_state.authenticated:
     show_login_modal()
     st.stop()
@@ -366,44 +265,36 @@ else:
     st.markdown(f"## 🎓 **{welcome_text}**")
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
     
-    # REMOVED THE "SIGN IN TO CONTINUE" MESSAGE COMPLETELY
-    
-    # Navigation Buttons - DIRECT ACCESS WITHOUT "SIGN IN TO CONTINUE" MESSAGE
+    # Navigation Buttons - DIRECT ACCESS WITHOUT AUTHENTICATION
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
         if st.button("💻\nTech\nCareers", key="tech"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'tech'
             st.rerun()
 
     with col2:
         if st.button("💰\nLive\nSalary", key="salary"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'salary'
             st.rerun()
 
     with col3:
         if st.button("📚\nLearning\nPaths", key="learn"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'learn'
             st.rerun()
 
     with col4:
         if st.button("🎓\nDIET\nGuide", key="diet"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'diet'
             st.rerun()
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'interview'
             st.rerun()
 
     with col6:
         if st.button("📊\nLive\nJobs", key="jobs"):
-            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'jobs'
             st.rerun()
     
