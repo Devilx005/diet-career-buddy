@@ -213,77 +213,143 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Hidden functional button for login - FIXED VERSION
+# COMPLETELY ISOLATED HIDDEN LOGIN TRIGGER
 if not st.session_state.authenticated:
-    # This invisible button provides the actual Streamlit functionality
-    # Use a unique key that won't conflict with navigation buttons
-    col_hidden1, col_hidden2, col_hidden3 = st.columns([1,1,1])
-    with col_hidden2:  # Put in middle column to avoid conflicts
-        login_clicked = st.button("🔐", key="unique_hidden_login_trigger_btn", help="Hidden login trigger")
+    # Create a completely separate container for the hidden trigger
+    st.markdown('<div id="hidden-login-container" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; visibility: hidden; pointer-events: none; z-index: -9999;"></div>', unsafe_allow_html=True)
+    
+    # Use expander to further isolate the button
+    with st.expander("🔐", expanded=False):
+        login_clicked = st.button("HIDDEN_LOGIN_TRIGGER_XYZ123", key="completely_isolated_login_btn_xyz789", help="Completely isolated login trigger")
         
         if login_clicked:
             st.session_state.show_login_modal = True
             st.rerun()
     
-    # JavaScript to connect header button to hidden button - IMPROVED
+    # JavaScript to connect header button to isolated hidden button
     st.markdown("""
     <script>
-    // Wait for page to load, then connect the header button
+    // Wait longer for page to fully load
     setTimeout(function() {
         const headerBtn = document.getElementById('headerLoginBtn');
         if (headerBtn) {
-            // Remove any existing event listeners
-            headerBtn.replaceWith(headerBtn.cloneNode(true));
-            const newHeaderBtn = document.getElementById('headerLoginBtn');
+            // Completely replace the button to remove all event listeners
+            const newBtn = headerBtn.cloneNode(true);
+            headerBtn.parentNode.replaceChild(newBtn, headerBtn);
             
-            newHeaderBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+            newBtn.addEventListener('click', function(event) {
+                // Completely prevent any default behavior
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                event.stopPropagation();
                 
-                // Find and click the hidden Streamlit button
-                const buttons = parent.document.querySelectorAll('button');
-                buttons.forEach(btn => {
-                    if (btn.title === 'Hidden login trigger' || btn.textContent.includes('🔐')) {
-                        btn.click();
-                        return;
+                // Find the isolated hidden button
+                const allButtons = parent.document.querySelectorAll('button');
+                let targetBtn = null;
+                
+                allButtons.forEach(btn => {
+                    if (btn.textContent && (
+                        btn.textContent.includes('HIDDEN_LOGIN_TRIGGER_XYZ123') ||
+                        btn.getAttribute('data-testid') === 'completely_isolated_login_btn_xyz789'
+                    )) {
+                        targetBtn = btn;
                     }
                 });
+                
+                if (targetBtn) {
+                    // Trigger click on isolated button
+                    targetBtn.click();
+                } else {
+                    console.log('Hidden login trigger not found');
+                }
+                
+                return false;
             });
         }
-    }, 1500);
+    }, 2000);
     </script>
     
     <style>
-    /* Hide the trigger button completely */
-    button[title="Hidden login trigger"],
-    button:contains("🔐"),
-    button[data-testid*="button"]:contains("🔐") {
+    /* Completely hide all traces of the hidden login trigger */
+    
+    /* Hide by content */
+    button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123"),
+    button[title*="isolated"],
+    button[data-testid="completely_isolated_login_btn_xyz789"] {
         display: none !important;
         position: absolute !important;
-        left: -9999px !important;
-        visibility: hidden !important;
+        left: -99999px !important;
+        top: -99999px !important;
         width: 0 !important;
         height: 0 !important;
         opacity: 0 !important;
-    }
-    
-    /* Also hide its container */
-    .element-container:has(button[title="Hidden login trigger"]),
-    .element-container:has(button:contains("🔐")) {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
         visibility: hidden !important;
-        height: 0 !important;
+        pointer-events: none !important;
+        z-index: -99999 !important;
         overflow: hidden !important;
     }
     
-    /* Ensure header login button stays visible and clickable */
+    /* Hide the expander containing the hidden button */
+    details:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")) {
+        display: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        z-index: -99999 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Hide any container with the hidden button */
+    .element-container:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")),
+    .streamlit-expanderHeader:contains("🔐"),
+    .streamlit-expander:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")) {
+        display: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        z-index: -99999 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure main login button stays visible */
     #headerLoginBtn {
         display: inline-block !important;
         visibility: visible !important;
         opacity: 1 !important;
         position: static !important;
+        pointer-events: auto !important;
+        z-index: 1000 !important;
+    }
+    
+    /* Hide expander with 🔐 icon */
+    div[data-testid="stExpander"]:has(summary:contains("🔐")),
+    details:has(summary:contains("🔐")) {
+        display: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Additional nuclear option - hide anything with isolated keywords */
+    *[class*="isolated"],
+    *[id*="isolated"],
+    *[data-testid*="isolated"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
     </style>
     """, unsafe_allow_html=True)
