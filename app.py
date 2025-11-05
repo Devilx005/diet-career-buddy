@@ -59,7 +59,7 @@ def show_login_form():
     
     st.info("**Demo Login:** username: `admin` | password: `password`")
 
-# HEADER WITH VISIBLE LOGIN BUTTON IN RIGHT CORNER
+# CLEAN HEADER - NO USELESS ICONS
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -98,6 +98,7 @@ if st.session_state.logged_in:
     </div>
     '''
 else:
+    # CLEAN HEADER - NO USELESS USER ICON
     header_html = '''
     <div style="
         position: fixed; 
@@ -118,50 +119,16 @@ else:
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
         </div>
-        <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
-            <button onclick="triggerLogin()" style="
-                cursor: pointer; 
-                font-size: 18px;
-                color: #10a37f;
-                background: rgba(16, 163, 127, 0.1);
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid rgba(16, 163, 127, 0.3);
-                transition: all 0.3s ease;
-            " 
-            onmouseover="this.style.background='rgba(16, 163, 127, 0.2)'; this.style.transform='scale(1.1)'"
-            onmouseout="this.style.background='rgba(16, 163, 127, 0.1)'; this.style.transform='scale(1)'">
-                👤
-            </button>
+        <div style="width: 200px; text-align: right;">
+            <!-- NO USELESS ICONS HERE -->
         </div>
     </div>
-    
-    <script>
-    function triggerLogin() {
-        const buttons = parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.getAttribute('title') === 'visible_login_trigger') {
-                btn.click();
-            }
-        });
-    }
-    </script>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
 
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
-
-# VISIBLE LOGIN TRIGGER - ALWAYS SHOWS
-if not st.session_state.logged_in:
-    if st.button("🔐 Login Trigger", key="visible_login_trigger", help="visible_login_trigger"):
-        st.session_state.show_login_form = True
-        st.rerun()
 
 # Show optional login form when triggered
 if st.session_state.show_login_form:
