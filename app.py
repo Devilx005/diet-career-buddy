@@ -22,101 +22,6 @@ st.set_page_config(
 # Apply CSS
 st.markdown(get_main_css(), unsafe_allow_html=True)
 
-# Enhanced Auth CSS
-st.markdown("""
-<style>
-    .auth-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        backdrop-filter: blur(5px);
-    }
-    
-    .auth-container {
-        max-width: 420px;
-        width: 90%;
-        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-        border-radius: 16px;
-        border: 2px solid #10a37f;
-        box-shadow: 0 25px 80px rgba(16, 163, 127, 0.3);
-        padding: 40px 30px;
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    
-    .auth-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .auth-title {
-        font-size: 1.8em;
-        font-weight: 700;
-        color: #10a37f;
-        margin-bottom: 8px;
-    }
-    
-    .auth-subtitle {
-        color: #a0aec0;
-        font-size: 0.95em;
-    }
-    
-    .divider {
-        text-align: center;
-        margin: 25px 0;
-        position: relative;
-        color: #666;
-        font-size: 0.85em;
-    }
-    
-    .divider::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #444, transparent);
-    }
-    
-    .divider span {
-        background: #1a1a1a;
-        padding: 0 15px;
-    }
-    
-    .signup-link {
-        text-align: center;
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid #333;
-        color: #a0aec0;
-        font-size: 0.9em;
-    }
-    
-    .signup-link a {
-        color: #10a37f;
-        text-decoration: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    
-    .signup-link a:hover {
-        text-decoration: underline;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # Session State
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
@@ -124,16 +29,8 @@ if 'username' not in st.session_state:
     st.session_state.username = ""
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
-if 'show_login_modal' not in st.session_state:
-    st.session_state.show_login_modal = False
-if 'auth_mode' not in st.session_state:
-    st.session_state.auth_mode = 'login'
-if 'login_clicked' not in st.session_state:
-    st.session_state.login_clicked = False
-if 'logout_clicked' not in st.session_state:
-    st.session_state.logout_clicked = False
 
-# Enhanced User Database
+# User Database
 USER_DB = {
     "emails": {
         "demo@gmail.com": {"password": "demo123", "name": "Demo User"},
@@ -142,168 +39,21 @@ USER_DB = {
     }
 }
 
-def authenticate_email(email, password):
-    if email in USER_DB["emails"]:
-        return USER_DB["emails"][email]["password"] == password, USER_DB["emails"][email]["name"]
-    return False, None
-
-def is_valid_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
-
-def show_login_modal():
-    """Professional login modal"""
-    st.markdown('<div class="auth-modal">', unsafe_allow_html=True)
-    st.markdown('<div class="auth-container">', unsafe_allow_html=True)
-    
-    # Header
-    st.markdown("""
-    <div class="auth-header">
-        <div class="auth-title">Welcome Back!</div>
-        <div class="auth-subtitle">Sign in to access your personalized career dashboard</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Login/Signup Toggle
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Login", key="login_tab", use_container_width=True,
-                    type="primary" if st.session_state.auth_mode == 'login' else "secondary"):
-            st.session_state.auth_mode = 'login'
-            st.rerun()
-    
-    with col2:
-        if st.button("Sign Up", key="signup_tab", use_container_width=True,
-                    type="primary" if st.session_state.auth_mode == 'signup' else "secondary"):
-            st.session_state.auth_mode = 'signup'
-            st.rerun()
-    
-    # OAuth Section
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🌐 Continue with Google", key="google_login", use_container_width=True):
-            st.session_state.authenticated = True
-            st.session_state.username = "Google User"
-            st.session_state.show_login_modal = False
-            st.success("✅ Signed in with Google!")
-            st.rerun()
-    
-    with col2:
-        if st.button("🎯 Demo Access", key="demo_access", use_container_width=True):
-            st.session_state.authenticated = True
-            st.session_state.username = "Demo User"
-            st.session_state.show_login_modal = False
-            st.success("✅ Demo access granted!")
-            st.rerun()
-    
-    st.markdown('<div class="divider"><span>Or with email</span></div>', unsafe_allow_html=True)
-    
-    # Main Auth Form
-    if st.session_state.auth_mode == 'login':
-        # LOGIN FORM
-        st.markdown("### 📧 Login")
-        
-        email = st.text_input("Email", placeholder="Enter your email address", key="login_email")
-        password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
-        
-        # Login button
-        if st.button("🚀 Login", key="login_submit", use_container_width=True, type="primary"):
-            if not email or not password:
-                st.error("❌ Please fill in all fields!")
-            elif not is_valid_email(email):
-                st.error("❌ Please enter a valid email address!")
-            else:
-                success, name = authenticate_email(email, password)
-                if success:
-                    st.session_state.authenticated = True
-                    st.session_state.username = name
-                    st.session_state.show_login_modal = False
-                    st.success(f"✅ Welcome back, {name}!")
-                    st.rerun()
-                else:
-                    st.error("❌ Invalid email or password!")
-        
-        # Sign up link
-        st.markdown("""
-        <div class="signup-link">
-            Don't have an account? <a href="#" onclick="document.getElementById('signup_tab').click()">Sign up</a>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    else:
-        # SIGNUP FORM
-        st.markdown("### 📝 Create Account")
-        
-        name = st.text_input("Full Name", placeholder="Enter your full name", key="signup_name")
-        email = st.text_input("Email", placeholder="Enter your email address", key="signup_email")
-        password = st.text_input("Password", type="password", placeholder="Create a password (min 8 chars)", key="signup_password")
-        confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="confirm_password")
-        
-        # Terms and conditions
-        terms_accepted = st.checkbox("I agree to the Terms of Service and Privacy Policy", key="terms")
-        
-        # Sign up button
-        if st.button("🎯 Create Account", key="signup_submit", use_container_width=True, type="primary"):
-            if not all([name, email, password, confirm_password]):
-                st.error("❌ Please fill in all fields!")
-            elif not is_valid_email(email):
-                st.error("❌ Please enter a valid email address!")
-            elif len(password) < 8:
-                st.error("❌ Password must be at least 8 characters!")
-            elif password != confirm_password:
-                st.error("❌ Passwords do not match!")
-            elif not terms_accepted:
-                st.error("❌ Please accept the terms and conditions!")
-            elif email in USER_DB["emails"]:
-                st.error("❌ Email already registered! Try signing in instead.")
-            else:
-                # Register new user
-                USER_DB["emails"][email] = {"password": password, "name": name}
-                st.success("✅ Account created successfully! Please sign in.")
-                st.session_state.auth_mode = 'login'
-                st.rerun()
-        
-        # Sign in link
-        st.markdown("""
-        <div class="signup-link">
-            Already have an account? <a href="#" onclick="document.getElementById('login_tab').click()">Sign in</a>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Close button
-    st.markdown("---")
-    if st.button("❌ Close", key="close_modal", use_container_width=True):
-        st.session_state.show_login_modal = False
-        st.rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Check for login/logout actions via JavaScript
-if st.session_state.login_clicked:
-    st.session_state.show_login_modal = True
-    st.session_state.login_clicked = False
-
-if st.session_state.logout_clicked:
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.session_state.page = 'home'
-    st.session_state.show_login_modal = False
-    st.session_state.logout_clicked = False
-
-# HEADER with DIRECTLY FUNCTIONAL Login Button
+# HEADER with THE ONLY LOGIN BUTTON
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="triggerLogout()">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="logout()">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
 else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
+    # THE ONLY LOGIN BUTTON - uses checkbox hack for functionality
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button onclick="triggerLogin()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <label for="login-trigger" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; display: inline-block;">Login</label>
+        <input type="checkbox" id="login-trigger" style="display: none;">
     </div>'''
 
 st.markdown(f"""
@@ -329,40 +79,241 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# JavaScript to handle login/logout directly with session state
+# CSS and JavaScript to make THE ONLY LOGIN BUTTON work
 st.markdown("""
+<style>
+    .auth-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(5px);
+    }
+    
+    .auth-container {
+        max-width: 420px;
+        width: 90%;
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        border-radius: 16px;
+        border: 2px solid #10a37f;
+        box-shadow: 0 25px 80px rgba(16, 163, 127, 0.3);
+        padding: 40px 30px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .auth-input {
+        width: calc(100% - 24px);
+        padding: 12px;
+        border: 1px solid #555;
+        border-radius: 8px;
+        background: #2d2d2d;
+        color: white;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .auth-input:focus {
+        border-color: #10a37f;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.2);
+    }
+    
+    .auth-button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    .primary-btn {
+        background: #10a37f;
+        color: white;
+    }
+    
+    .primary-btn:hover {
+        background: #0d8f6b;
+        transform: translateY(-1px);
+    }
+    
+    .secondary-btn {
+        background: #333;
+        color: white;
+        border: 1px solid #555;
+    }
+    
+    .secondary-btn:hover {
+        background: #444;
+        border-color: #10a37f;
+    }
+    
+    .google-btn {
+        background: #4285f4;
+        color: white;
+    }
+    
+    .google-btn:hover {
+        background: #3367d6;
+    }
+</style>
+
 <script>
-function triggerLogin() {
-    // Set session state via URL parameter
-    window.location.href = window.location.href.split('?')[0] + '?action=login';
+// Handle login button click
+document.addEventListener('DOMContentLoaded', function() {
+    const loginTrigger = document.getElementById('login-trigger');
+    const modal = document.querySelector('.auth-modal');
+    
+    if (loginTrigger) {
+        loginTrigger.addEventListener('change', function() {
+            if (this.checked) {
+                modal.style.display = 'flex';
+            }
+        });
+    }
+});
+
+function closeModal() {
+    document.getElementById('login-trigger').checked = false;
+    document.querySelector('.auth-modal').style.display = 'none';
 }
 
-function triggerLogout() {
+function doLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        alert('❌ Please fill in all fields!');
+        return;
+    }
+    
+    // Check credentials
+    const validCredentials = {
+        'demo@gmail.com': { password: 'demo123', name: 'Demo User' },
+        'student@diet.ac.in': { password: 'student123', name: 'DIET Student' },
+        'admin@diet.com': { password: 'admin123', name: 'Admin User' }
+    };
+    
+    if (validCredentials[email] && validCredentials[email].password === password) {
+        // Store login state
+        sessionStorage.setItem('authenticated', 'true');
+        sessionStorage.setItem('username', validCredentials[email].name);
+        alert('✅ Login successful!');
+        location.reload();
+    } else {
+        alert('❌ Invalid credentials!\\n\\nTry:\\ndemo@gmail.com / demo123\\nstudent@diet.ac.in / student123\\nadmin@diet.com / admin123');
+    }
+}
+
+function demoLogin() {
+    sessionStorage.setItem('authenticated', 'true');
+    sessionStorage.setItem('username', 'Demo User');
+    alert('✅ Demo access granted!');
+    location.reload();
+}
+
+function googleLogin() {
+    sessionStorage.setItem('authenticated', 'true');
+    sessionStorage.setItem('username', 'Google User');
+    alert('✅ Signed in with Google!');
+    location.reload();
+}
+
+function logout() {
     if (confirm('Sign out?')) {
-        // Set session state via URL parameter
-        window.location.href = window.location.href.split('?')[0] + '?action=logout';
+        sessionStorage.removeItem('authenticated');
+        sessionStorage.removeItem('username');
+        location.reload();
+    }
+}
+
+// Check if user is logged in on page load
+window.addEventListener('load', function() {
+    if (sessionStorage.getItem('authenticated') === 'true') {
+        // User is logged in - this will be handled by Streamlit session state
+    }
+});
+</script>
+
+<!-- THE LOGIN MODAL (triggered by THE ONLY LOGIN BUTTON) -->
+<div class="auth-modal">
+    <div class="auth-container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 1.8em; font-weight: 700; color: #10a37f; margin-bottom: 8px;">Welcome Back!</div>
+            <div style="color: #a0aec0; font-size: 0.95em;">Sign in to access your personalized career dashboard</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 6px; color: #a0aec0; font-size: 0.9em; font-weight: 500;">Email</label>
+            <input type="email" id="login-email" placeholder="Enter your email address" class="auth-input">
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 6px; color: #a0aec0; font-size: 0.9em; font-weight: 500;">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password" class="auth-input">
+        </div>
+        
+        <button onclick="doLogin()" class="auth-button primary-btn">🚀 Login</button>
+        
+        <div style="text-align: center; margin: 20px 0; color: #666; font-size: 0.85em;">
+            <div style="position: relative;">
+                <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #444;"></div>
+                <span style="background: #1a1a1a; padding: 0 15px;">Or continue with</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="demoLogin()" class="auth-button secondary-btn" style="flex: 1;">🎯 Demo Access</button>
+            <button onclick="googleLogin()" class="auth-button google-btn" style="flex: 1;">🌐 Google</button>
+        </div>
+        
+        <button onclick="closeModal()" class="auth-button secondary-btn" style="background: transparent; color: #666; border: 1px solid #444;">❌ Close</button>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; color: #666; font-size: 0.85em;">
+            <strong>Demo Credentials:</strong><br>
+            📧 demo@gmail.com / demo123<br>
+            🎓 student@diet.ac.in / student123<br>
+            👨‍💼 admin@diet.com / admin123
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Check session storage for authentication
+st.markdown("""
+<script>
+if (sessionStorage.getItem('authenticated') === 'true') {
+    const username = sessionStorage.getItem('username');
+    if (username) {
+        // Set Streamlit session state via URL parameter
+        if (!window.location.href.includes('?authenticated=true')) {
+            window.location.href = window.location.href + '?authenticated=true&username=' + encodeURIComponent(username);
+        }
     }
 }
 </script>
 """, unsafe_allow_html=True)
 
-# Handle URL parameters for login/logout
-action = st.query_params.get("action")
-if action == "login":
-    st.session_state.show_login_modal = True
-    st.query_params.clear()
-elif action == "logout":
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.session_state.page = 'home'
-    st.session_state.show_login_modal = False
+# Handle authentication from URL parameters
+if st.query_params.get("authenticated") == "true":
+    username = st.query_params.get("username", "User")
+    st.session_state.authenticated = True
+    st.session_state.username = username
     st.query_params.clear()
     st.rerun()
-
-# Show login modal when triggered
-if st.session_state.show_login_modal and not st.session_state.authenticated:
-    show_login_modal()
-    st.stop()
 
 # Dashboard Routing
 if st.session_state.page == 'tech':
@@ -420,8 +371,7 @@ else:
                 st.session_state.page = 'tech'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
 
     with col2:
         if st.button("💰\nLive\nSalary", key="salary"):
@@ -429,8 +379,7 @@ else:
                 st.session_state.page = 'salary'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
 
     with col3:
         if st.button("📚\nLearning\nPaths", key="learn"):
@@ -438,8 +387,7 @@ else:
                 st.session_state.page = 'learn'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
 
     with col4:
         if st.button("🎓\nDIET\nGuide", key="diet"):
@@ -447,8 +395,7 @@ else:
                 st.session_state.page = 'diet'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview"):
@@ -456,8 +403,7 @@ else:
                 st.session_state.page = 'interview'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
 
     with col6:
         if st.button("📊\nLive\nJobs", key="jobs"):
@@ -465,8 +411,7 @@ else:
                 st.session_state.page = 'jobs'
                 st.rerun()
             else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+                st.info("Please login to access dashboards")
     
     st.markdown("""
     <div class="dashboard-card">
