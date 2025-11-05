@@ -59,7 +59,7 @@ def show_login_form():
     
     st.info("**Demo Login:** username: `admin` | password: `password`")
 
-# HEADER WITH LOGIN TRIGGER IN RIGHT CORNER
+# CLEAN HEADER - NO USELESS DECORATIVE ICONS
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -98,6 +98,7 @@ if st.session_state.logged_in:
     </div>
     '''
 else:
+    # CLEAN HEADER - NO DECORATIVE ICONS
     header_html = '''
     <div style="
         position: fixed; 
@@ -118,37 +119,10 @@ else:
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
         </div>
-        <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
-            <button onclick="triggerLoginFromHeader()" style="
-                background: rgba(16, 163, 127, 0.8) !important;
-                color: white !important;
-                border: 1px solid #10a37f !important;
-                padding: 6px 12px !important;
-                border-radius: 6px !important;
-                font-weight: 600 !important;
-                cursor: pointer !important;
-                font-size: 13px !important;
-                transition: all 0.3s ease !important;
-            " 
-            onmouseover="this.style.background='#10a37f'; this.style.transform='scale(1.05)'"
-            onmouseout="this.style.background='rgba(16, 163, 127, 0.8)'; this.style.transform='scale(1)'">
-                🔐 Login
-            </button>
+        <div style="width: 200px; text-align: right;">
+            <!-- NO DECORATIVE ICONS HERE -->
         </div>
     </div>
-    
-    <script>
-    function triggerLoginFromHeader() {
-        // Find and click the hidden Streamlit login trigger
-        const buttons = parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.getAttribute('title') === 'header_login_trigger') {
-                btn.click();
-                return;
-            }
-        });
-    }
-    </script>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
@@ -156,29 +130,36 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# HIDDEN LOGIN TRIGGER - CONNECTED TO HEADER BUTTON
+# WORKING LOGIN TRIGGER - POSITIONED IN RIGHT CORNER OF TITLE BAR USING CSS
 if not st.session_state.logged_in:
-    if st.button("🔐 Hidden Header Login Trigger", key="header_login_trigger", help="header_login_trigger"):
+    if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
         st.session_state.show_login_form = True
         st.rerun()
     
-    # Hide the trigger button completely
+    # Position the login trigger in the right corner of title bar using CSS
     st.markdown("""
     <style>
-    button[title="header_login_trigger"] {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        z-index: -9999 !important;
+    button[title="working_login_trigger"] {
+        position: fixed !important;
+        top: 10px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
+        background: rgba(16, 163, 127, 0.8) !important;
+        color: white !important;
+        border: none !important;
+        padding: 6px 12px !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
     }
     
-    .element-container:has(button[title="header_login_trigger"]) {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-        visibility: hidden !important;
+    .element-container:has(button[title="working_login_trigger"]) {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        z-index: 1001 !important;
+        width: auto !important;
+        height: auto !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -320,4 +301,4 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_handle_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
