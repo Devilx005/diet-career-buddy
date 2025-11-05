@@ -1,6 +1,7 @@
 import streamlit as st
 from styles import get_main_css
 
+
 # Import all dashboards (from root directory)
 import tech_dashboard
 import salary_dashboard
@@ -9,14 +10,17 @@ import diet_guide
 import interview_prep
 import jobs_dashboard
 
+
 st.set_page_config(
     page_title="🎓 DIET Career Buddy", 
     layout="wide", 
     initial_sidebar_state="collapsed"
 )
 
+
 # Apply CSS
 st.markdown(get_main_css(), unsafe_allow_html=True)
+
 
 # Session State - MINIMAL ONLY + LOGIN FEATURE
 if 'page' not in st.session_state:
@@ -27,6 +31,7 @@ if 'username' not in st.session_state:
     st.session_state.username = ""
 if 'show_login_form' not in st.session_state:
     st.session_state.show_login_form = False
+
 
 # Optional Login Function
 def show_login_form():
@@ -58,6 +63,7 @@ def show_login_form():
             st.rerun()
     
     st.info("**Demo Login:** username: `admin` | password: `password`")
+
 
 # CLEAN HEADER - NO USELESS DECORATIVE ICONS
 if st.session_state.logged_in:
@@ -125,21 +131,37 @@ else:
     </div>
     '''
 
+
 st.markdown(header_html, unsafe_allow_html=True)
+
 
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
+
 
 # WORKING LOGIN TRIGGER - ALWAYS VISIBLE (NOT HIDDEN)
 if not st.session_state.logged_in:
     if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
         st.session_state.show_login_form = True
         st.rerun()
+    
+    st.markdown("""
+    <style>
+    button[title="working_login_trigger"] {
+        position: fixed !important;
+        top: 10px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # Show optional login form when triggered
 if st.session_state.show_login_form:
     show_login_form()
     st.stop()
+
 
 # Dashboard Routing - WORKS FOR EVERYONE
 if st.session_state.page == 'tech':
@@ -148,11 +170,13 @@ if st.session_state.page == 'tech':
         st.session_state.page = 'home'
         st.rerun()
 
+
 elif st.session_state.page == 'salary':
     salary_dashboard.show()
     if st.button("🏠 Back to Home", key="back_salary"):
         st.session_state.page = 'home'
         st.rerun()
+
 
 elif st.session_state.page == 'learn':
     learning_dashboard.show()
@@ -160,11 +184,13 @@ elif st.session_state.page == 'learn':
         st.session_state.page = 'home'
         st.rerun()
 
+
 elif st.session_state.page == 'diet':
     diet_guide.show()
     if st.button("🏠 Back to Home", key="back_diet"):
         st.session_state.page = 'home'
         st.rerun()
+
 
 elif st.session_state.page == 'interview':
     interview_prep.show()
@@ -172,11 +198,13 @@ elif st.session_state.page == 'interview':
         st.session_state.page = 'home'
         st.rerun()
 
+
 elif st.session_state.page == 'jobs':
     jobs_dashboard.show()
     if st.button("🏠 Back to Home", key="back_jobs"):
         st.session_state.page = 'home'
         st.rerun()
+
 
 else:
     # HOME PAGE - WORKS FOR EVERYONE
@@ -198,25 +226,30 @@ else:
             st.session_state.page = 'tech'
             st.rerun()
 
+
     with col2:
         if st.button("💰\nLive\nSalary", key="salary", use_container_width=True):
             st.session_state.page = 'salary'
             st.rerun()
+
 
     with col3:
         if st.button("📚\nLearning\nPaths", key="learn", use_container_width=True):
             st.session_state.page = 'learn'
             st.rerun()
 
+
     with col4:
         if st.button("🎓\nDIET\nGuide", key="diet", use_container_width=True):
             st.session_state.page = 'diet'
             st.rerun()
 
+
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview", use_container_width=True):
             st.session_state.page = 'interview'
             st.rerun()
+
 
     with col6:
         if st.button("📊\nLive\nJobs", key="jobs", use_container_width=True):
@@ -272,5 +305,6 @@ else:
             {response}
         </div>
         """, unsafe_allow_html=True)
+
 
 st.markdown('</div>', unsafe_allow_html=True)
