@@ -58,7 +58,7 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-# Simple Routing
+# Dashboard Routing
 if st.session_state.page == 'tech':
     tech_dashboard.show()
     if st.button("🏠 Back to Home", key="back_tech"):
@@ -96,7 +96,7 @@ elif st.session_state.page == 'jobs':
         st.rerun()
 
 else:
-    # Home Page - COMPLETE with missing chat feature
+    # Home Page - Complete with Enhanced Chat
     st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
     
@@ -111,32 +111,54 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # MISSING FEATURE RESTORED - Interactive Chat Section
+    # ENHANCED CHAT SECTION - With Send Button & Larger Input
     st.markdown("### 💬 **Ask Your Career Questions!**")
-    user_input = st.text_input("💭 What would you like to know about your career?", 
-                              placeholder="e.g., What skills do I need for data science?")
     
-    if user_input:
+    # Create columns for input and button
+    col_input, col_button = st.columns([4, 1])
+    
+    with col_input:
+        user_input = st.text_area("💭 What would you like to know about your career?", 
+                                 placeholder="e.g., What skills do I need for data science?\nWhat companies hire from DIET?\nHow much salary can I expect?",
+                                 height=100,
+                                 key="career_question_input")
+    
+    with col_button:
+        # Add some spacing to align with text area
+        st.markdown("<br>", unsafe_allow_html=True)
+        send_clicked = st.button("🚀 Send", 
+                                key="send_question", 
+                                help="Click to get AI-powered career advice",
+                                use_container_width=True,
+                                type="primary")
+    
+    # Process the question when Send is clicked
+    if send_clicked and user_input.strip():
         response = "Excellent question! "
         
-        if any(word in user_input.lower() for word in ['salary', 'pay', 'money']):
-            response += "💰 Check the **Live Salary** dashboard for comprehensive market-adjusted salary data!"
-        elif any(word in user_input.lower() for word in ['job', 'hiring', 'market']):
-            response += "📊 Visit the **Live Jobs** dashboard for real-time market insights!"
-        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course', 'study']):
-            response += "📚 Explore the **Learning Paths** dashboard for detailed roadmaps and progress tracking!"
-        elif any(word in user_input.lower() for word in ['tech', 'technology', 'career']):
+        if any(word in user_input.lower() for word in ['salary', 'pay', 'money', 'package', 'compensation']):
+            response += "💰 Check the **Live Salary** dashboard for comprehensive market-adjusted salary data with real-time market intelligence!"
+        elif any(word in user_input.lower() for word in ['job', 'hiring', 'market', 'companies', 'openings']):
+            response += "📊 Visit the **Live Jobs** dashboard for real-time market insights and hiring trends!"
+        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course', 'study', 'roadmap', 'path']):
+            response += "📚 Explore the **Learning Paths** dashboard for detailed roadmaps and interactive progress tracking!"
+        elif any(word in user_input.lower() for word in ['tech', 'technology', 'career', 'software', 'developer']):
             response += "💻 Check the **Tech Careers** dashboard for comprehensive career guidance and market trends!"
-        elif any(word in user_input.lower() for word in ['interview', 'preparation', 'prep']):
-            response += "🎯 Check the **Interview Prep** dashboard for preparation tips and practice tracking!"
-        elif any(word in user_input.lower() for word in ['diet', 'college', 'placement']):
-            response += "🎓 Visit the **DIET Guide** dashboard for college-specific placement guidance!"
+        elif any(word in user_input.lower() for word in ['interview', 'preparation', 'prep', 'coding', 'questions']):
+            response += "🎯 Check the **Interview Prep** dashboard for preparation tips, practice tracking, and company-specific guides!"
+        elif any(word in user_input.lower() for word in ['diet', 'college', 'placement', 'campus']):
+            response += "🎓 Visit the **DIET Guide** dashboard for college-specific placement guidance and company insights!"
         else:
-            response += "🎓 Click any dashboard button above for detailed insights and interactive tools!"
+            response += "🎓 Click any dashboard button above for detailed insights and interactive tools tailored to your career journey!"
         
         st.markdown(f"""
         <div class="dashboard-card">
-            <strong>You asked:</strong> {user_input}<br><br>
-            <strong>🎓 Assistant:</strong> {response}
+            <strong>❓ You asked:</strong><br>
+            <em>"{user_input}"</em><br><br>
+            <strong>🎓 AI Assistant:</strong><br>
+            {response}
         </div>
         """, unsafe_allow_html=True)
+    
+    elif send_clicked and not user_input.strip():
+        st.warning("💭 Please enter your career question first!")
