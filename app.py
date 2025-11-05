@@ -65,7 +65,7 @@ def show_login_form():
     st.info("**Demo Login:** username: `admin` | password: `password`")
 
 
-# HEADER WITH LOGIN BUTTON IN RIGHT CORNER
+# HEADER WITH FUNCTIONAL LOGIN BUTTON IN RIGHT CORNER
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -125,29 +125,20 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
-            <button onclick="triggerLogin()" style="
-                background: rgba(16, 163, 127, 0.8);
-                color: white;
-                border: none;
-                padding: 6px 12px;
-                border-radius: 6px;
-                font-weight: 600;
-                cursor: pointer;
-                font-size: 13px;
-            ">🔐 Login Trigger</button>
+            <form method="post" action="">
+                <button type="submit" name="login_trigger" value="true" style="
+                    background: rgba(16, 163, 127, 0.8);
+                    color: white;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 13px;
+                ">🔐 Login Trigger</button>
+            </form>
         </div>
     </div>
-    
-    <script>
-    function triggerLogin() {
-        const buttons = parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.getAttribute('key') === 'working_login_trigger') {
-                btn.click();
-            }
-        });
-    }
-    </script>
     '''
 
 
@@ -158,19 +149,10 @@ st.markdown(header_html, unsafe_allow_html=True)
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
 
-# WORKING LOGIN TRIGGER - HIDDEN BUT FUNCTIONAL
-if not st.session_state.logged_in:
-    if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
-        st.session_state.show_login_form = True
-        st.rerun()
-    
-    st.markdown("""
-    <style>
-    button[key="working_login_trigger"] {
-        display: none !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Check for login trigger from header button
+if not st.session_state.logged_in and 'login_trigger' in st.query_params:
+    st.session_state.show_login_form = True
+    st.query_params.clear()
 
 
 # Show optional login form when triggered
@@ -263,7 +245,7 @@ else:
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview", use_container_width=True):
-            st.session_state.page = 'interview'
+            st.session_state.page = 'ient'
             st.rerun()
 
 
