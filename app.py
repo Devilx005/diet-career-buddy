@@ -4,7 +4,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# GENTLE LIFT CSS - Move up without breaking
+# MOBILE-OPTIMIZED CSS - 2 buttons per row on mobile
 st.markdown("""
 <style>
     .main .block-container { 
@@ -26,7 +26,7 @@ st.markdown("""
     }
     .stApp { 
         background: #212121 !important; 
-        margin-top: -60px !important; /* GENTLE lift up */
+        margin-top: -60px !important;
     }
     
     /* Remove some gaps between elements */
@@ -45,7 +45,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* Better button spacing */
+    /* DESKTOP - 6 buttons in one row */
     .stColumns { 
         gap: 0.5rem !important; 
     }
@@ -96,6 +96,38 @@ st.markdown("""
         margin: 4px !important;
     }
     
+    /* MOBILE - 2 buttons per row (3 rows total) */
+    @media (max-width: 768px) {
+        .mobile-button-container {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            margin: 1rem 0 !important;
+        }
+        
+        .mobile-button-container .stButton > button {
+            height: 55px !important;
+            font-size: 9px !important;
+            padding: 4px !important;
+        }
+        
+        .desktop-buttons {
+            display: none !important;
+        }
+        
+        .header {
+            font-size: 16px !important;
+            padding: 12px !important;
+        }
+    }
+    
+    /* DESKTOP - Hide mobile buttons */
+    @media (min-width: 769px) {
+        .mobile-button-container {
+            display: none !important;
+        }
+    }
+    
     /* Improve content spacing */
     .main-title {
         margin-top: 0.5rem !important;
@@ -136,7 +168,8 @@ if 'page' not in st.session_state:
 # Header
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# Navigation Buttons with proper spacing
+# DESKTOP Navigation Buttons (6 in a row)
+st.markdown('<div class="desktop-buttons">', unsafe_allow_html=True)
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -168,6 +201,49 @@ with col6:
     if st.button("📊\nLive\nJobs", key="jobs"):
         st.session_state.page = 'jobs'
         st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# MOBILE Navigation Buttons (2 per row = 3 rows)
+st.markdown('<div class="mobile-button-container">', unsafe_allow_html=True)
+
+# Row 1: Tech Careers + Live Salary
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("💻 Tech Careers", key="tech_mobile"):
+        st.session_state.page = 'tech'
+        st.rerun()
+
+with col2:
+    if st.button("💰 Live Salary", key="salary_mobile"):
+        st.session_state.page = 'salary'
+        st.rerun()
+
+# Row 2: Learning Paths + DIET Guide  
+col3, col4 = st.columns(2)
+with col3:
+    if st.button("📚 Learning Paths", key="learn_mobile"):
+        st.session_state.page = 'learn'
+        st.rerun()
+
+with col4:
+    if st.button("🎓 DIET Guide", key="diet_mobile"):
+        st.session_state.page = 'diet'
+        st.rerun()
+
+# Row 3: Interview Prep + Live Jobs
+col5, col6 = st.columns(2)
+with col5:
+    if st.button("🎯 Interview Prep", key="interview_mobile"):
+        st.session_state.page = 'interview'
+        st.rerun()
+
+with col6:
+    if st.button("📊 Live Jobs", key="jobs_mobile"):
+        st.session_state.page = 'jobs'
+        st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Content with better spacing
 if st.session_state.page == 'jobs':
