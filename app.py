@@ -422,13 +422,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# HIDDEN CONTROL BUTTONS (completely invisible)
-st.markdown('<div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">', unsafe_allow_html=True)
 
-# Hidden Sign In trigger
-if st.button("Hidden Sign In", key="signin-btn-hidden"):
-    st.session_state.show_login_modal = True
-    st.rerun()
 
 # Hidden user menu
 if st.button("Hidden User Menu", key="user-menu-hidden"):
