@@ -369,62 +369,44 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons
+    # Navigation Buttons - TEMPORARILY DISABLED AUTHENTICATION
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
         if st.button("💻\nTech\nCareers", key="tech"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'tech'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'tech'
+            st.rerun()
 
     with col2:
         if st.button("💰\nLive\nSalary", key="salary"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'salary'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'salary'
+            st.rerun()
 
     with col3:
         if st.button("📚\nLearning\nPaths", key="learn"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'learn'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'learn'
+            st.rerun()
 
     with col4:
         if st.button("🎓\nDIET\nGuide", key="diet"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'diet'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'diet'
+            st.rerun()
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'interview'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'interview'
+            st.rerun()
 
     with col6:
         if st.button("📊\nLive\nJobs", key="jobs"):
-            if st.session_state.authenticated:
-                st.session_state.page = 'jobs'
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
+            # TEMPORARILY BYPASS AUTHENTICATION
+            st.session_state.page = 'jobs'
+            st.rerun()
     
     st.markdown("""
     <div class="dashboard-card">
