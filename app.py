@@ -114,6 +114,11 @@ st.markdown("""
     .signup-link a:hover {
         text-decoration: underline;
     }
+
+    /* Hide specific buttons */
+    .element-container:has(button[kind="secondary"][data-testid="baseButton-secondary"]) {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -275,11 +280,11 @@ def show_login_modal():
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# HEADER with clean Login/Logout functionality
+# HEADER
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) {{ window.location.href=window.location.href+'?logout=1' }}">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" title="Click to logout">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
@@ -287,7 +292,7 @@ else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button onclick="window.location.href=window.location.href+'?login=1'" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <button style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
     </div>'''
 
 st.markdown(f"""
@@ -313,19 +318,76 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Handle URL parameters for login/logout (NO EXTRA BUTTONS!)
-if st.query_params.get("login") == "1":
-    st.session_state.show_login_modal = True
+# ✅ WORKING LOGIN BUTTONS (properly hidden)
+col1, col2 = st.columns([1, 1])
+with col1:
+    if st.button("Open Login", key="open_login"):
+        st.session_state.show_login_modal = True
+        st.rerun()
 
-if st.query_params.get("logout") == "1":
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.session_state.page = 'home'
-    st.session_state.show_login_modal = False
-    st.query_params.clear()
-    st.rerun()
+with col2:
+    if st.button("Logout User", key="logout_user"):
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.session_state.page = 'home'
+        st.session_state.show_login_modal = False
+        st.rerun()
 
-# Show login modal when triggered
+# JavaScript to connect header buttons to Streamlit buttons
+st.markdown("""
+<script>
+setTimeout(function() {
+    // Find header login button
+    const headerButtons = parent.document.querySelectorAll('button');
+    let headerLoginBtn = null;
+    let headerUserDiv = null;
+    
+    headerButtons.forEach(btn => {
+        if (btn.textContent.trim() === 'Login') {
+            headerLoginBtn = btn;
+        }
+    });
+    
+    // Find user div
+    const userDivs = parent.document.querySelectorAll('div[title="Click to logout"]');
+    if (userDivs.length > 0) {
+        headerUserDiv = userDivs[0];
+    }
+    
+    // Find Streamlit trigger buttons
+    const stButtons = parent.document.querySelectorAll('button');
+    let loginTrigger = null;
+    let logoutTrigger = null;
+    
+    stButtons.forEach(btn => {
+        if (btn.textContent.includes('Open Login')) {
+            loginTrigger = btn;
+        }
+        if (btn.textContent.includes('Logout User')) {
+            logoutTrigger = btn;
+        }
+    });
+    
+    // Connect login button
+    if (headerLoginBtn && loginTrigger) {
+        headerLoginBtn.onclick = function() {
+            loginTrigger.click();
+        };
+    }
+    
+    // Connect logout
+    if (headerUserDiv && logoutTrigger) {
+        headerUserDiv.onclick = function() {
+            if (confirm('Sign out?')) {
+                logoutTrigger.click();
+            }
+        };
+    }
+}, 1000);
+</script>
+""", unsafe_allow_html=True)
+
+# Show login modal
 if st.session_state.show_login_modal and not st.session_state.authenticated:
     show_login_modal()
     st.stop()
@@ -368,7 +430,7 @@ elif st.session_state.page == 'jobs':
         st.rerun()
 
 else:
-    # HOME PAGE (keep your existing home page)
+    # HOME PAGE (your existing home page)
     welcome_text = f"Welcome back, {st.session_state.username}!" if st.session_state.authenticated else "Welcome to DIET Career Buddy!"
     
     st.markdown(f"## 🎓 **{welcome_text}**")
@@ -377,7 +439,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons (keep your existing buttons)
+    # Navigation Buttons (your existing buttons)
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
@@ -434,7 +496,7 @@ else:
                 st.session_state.show_login_modal = True
                 st.rerun()
     
-    # Keep your existing content sections
+    # Your existing content sections
     st.markdown("""
     <div class="dashboard-card">
         <strong>🚀 What Makes Us Special:</strong><br><br>
@@ -446,7 +508,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Chat Section (keep your existing chat)
+    # Chat Section (your existing chat)
     st.markdown("### 💬 **Ask Your Career Questions!**")
     
     col_input, col_button = st.columns([4, 1])
