@@ -22,20 +22,27 @@ st.set_page_config(
 # Apply CSS
 st.markdown(get_main_css(), unsafe_allow_html=True)
 
-# Professional Auth CSS
+# Enhanced Auth CSS
 st.markdown("""
 <style>
+    /* Hide Streamlit elements */
+    .element-container:has(> div > div > button[kind="secondary"]:contains("Login Trigger")),
+    .element-container:has(> div > div > button[kind="secondary"]:contains("User Menu")) {
+        display: none !important;
+    }
+    
     .auth-modal {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.85);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 2000;
+        backdrop-filter: blur(5px);
     }
     
     .auth-container {
@@ -44,17 +51,23 @@ st.markdown("""
         background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
         border-radius: 16px;
         border: 2px solid #10a37f;
-        box-shadow: 0 20px 60px rgba(16, 163, 127, 0.3);
+        box-shadow: 0 25px 80px rgba(16, 163, 127, 0.3);
         padding: 40px 30px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     
     .auth-header {
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
     }
     
     .auth-title {
-        font-size: 1.6em;
+        font-size: 1.8em;
         font-weight: 700;
         color: #10a37f;
         margin-bottom: 8px;
@@ -62,13 +75,41 @@ st.markdown("""
     
     .auth-subtitle {
         color: #a0aec0;
-        font-size: 0.9em;
+        font-size: 0.95em;
+    }
+    
+    .auth-toggle {
+        display: flex;
+        background: #333;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        padding: 4px;
+    }
+    
+    .auth-tab {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: #a0aec0;
+    }
+    
+    .auth-tab.active {
+        background: #10a37f;
+        color: white;
+    }
+    
+    .oauth-section {
+        margin-bottom: 20px;
     }
     
     .oauth-btn {
         width: 100%;
         padding: 12px;
-        margin: 6px 0;
+        margin: 8px 0;
         border: 1px solid #555;
         border-radius: 8px;
         background: #333;
@@ -79,7 +120,7 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
     }
     
     .oauth-btn:hover {
@@ -89,17 +130,17 @@ st.markdown("""
     }
     
     .google-btn {
-        background: #4285f4 !important;
+        background: linear-gradient(135deg, #4285f4, #34a853) !important;
         border-color: #4285f4 !important;
     }
     
     .google-btn:hover {
-        background: #3367d6 !important;
+        background: linear-gradient(135deg, #3367d6, #2d8f42) !important;
     }
     
     .divider {
         text-align: center;
-        margin: 20px 0;
+        margin: 25px 0;
         position: relative;
         color: #666;
         font-size: 0.85em;
@@ -112,12 +153,43 @@ st.markdown("""
         left: 0;
         right: 0;
         height: 1px;
-        background: #444;
+        background: linear-gradient(90deg, transparent, #444, transparent);
     }
     
     .divider span {
         background: #1a1a1a;
-        padding: 0 12px;
+        padding: 0 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        color: #a0aec0;
+        font-size: 0.9em;
+        font-weight: 500;
+    }
+    
+    .signup-link {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #333;
+        color: #a0aec0;
+        font-size: 0.9em;
+    }
+    
+    .signup-link a {
+        color: #10a37f;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .signup-link a:hover {
+        text-decoration: underline;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -146,20 +218,16 @@ if 'current_otp' not in st.session_state:
 USER_DB = {
     "emails": {
         "demo@gmail.com": {"password": "demo123", "name": "Demo User"},
-        "student@diet.ac.in": {"password": "student123", "name": "DIET Student"}
+        "student@diet.ac.in": {"password": "student123", "name": "DIET Student"},
+        "admin@diet.com": {"password": "admin123", "name": "Admin User"}
     },
     "phones": {
-        "9876543210": {"name": "Phone User"}
+        "9876543210": {"name": "Phone User"},
+        "8765432109": {"name": "Test User"}
     }
 }
 
-def authenticate_user(username, password):
-    """Simple username/password auth"""
-    USERS = {"student": "password123", "demo": "demo123", "admin": "admin123", "diet": "diet2025"}
-    return username in USERS and USERS[username] == password
-
 def authenticate_email(email, password):
-    """Email authentication"""
     if email in USER_DB["emails"]:
         return USER_DB["emails"][email]["password"] == password, USER_DB["emails"][email]["name"]
     return False, None
@@ -175,8 +243,8 @@ def is_valid_phone(phone):
 def generate_otp():
     return f"{random.randint(100000, 999999)}"
 
-def show_professional_login():
-    """Professional login modal"""
+def show_real_world_login():
+    """Real-world professional login modal"""
     st.markdown('<div class="auth-modal">', unsafe_allow_html=True)
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     
@@ -188,10 +256,30 @@ def show_professional_login():
     </div>
     """, unsafe_allow_html=True)
     
-    # OAuth Buttons
+    # Login/Signup Toggle
+    st.markdown('<div class="auth-toggle">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🌐 Google", key="google_auth", use_container_width=True):
+        if st.button("Sign In", key="signin_tab", use_container_width=True,
+                    type="primary" if st.session_state.auth_mode == 'login' else "secondary"):
+            st.session_state.auth_mode = 'login'
+            st.session_state.otp_sent = False
+            st.rerun()
+    
+    with col2:
+        if st.button("Sign Up", key="signup_tab", use_container_width=True,
+                    type="primary" if st.session_state.auth_mode == 'signup' else "secondary"):
+            st.session_state.auth_mode = 'signup'
+            st.session_state.otp_sent = False
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # OAuth Section
+    st.markdown('<div class="oauth-section">', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🌐 Continue with Google", key="google_login", use_container_width=True):
             st.session_state.authenticated = True
             st.session_state.username = "Google User"
             st.session_state.show_login_modal = False
@@ -199,127 +287,119 @@ def show_professional_login():
             st.rerun()
     
     with col2:
-        if st.button("🎯 Demo", key="demo_quick", use_container_width=True):
+        if st.button("🎯 Demo Access", key="demo_access", use_container_width=True):
             st.session_state.authenticated = True
             st.session_state.username = "Demo User"
             st.session_state.show_login_modal = False
-            st.success("✅ Demo access!")
+            st.success("✅ Demo access granted!")
             st.rerun()
     
-    st.markdown('<div class="divider"><span>Or continue with</span></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    # Method Selection
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("📧 Email", key="email_method", use_container_width=True,
-                    type="primary" if st.session_state.auth_method == 'email' else "secondary"):
-            st.session_state.auth_method = 'email'
-            st.session_state.otp_sent = False
-            st.rerun()
+    st.markdown('<div class="divider"><span>Or with email</span></div>', unsafe_allow_html=True)
     
-    with col2:
-        if st.button("📱 Phone", key="phone_method", use_container_width=True,
-                    type="primary" if st.session_state.auth_method == 'phone' else "secondary"):
-            st.session_state.auth_method = 'phone'
-            st.session_state.otp_sent = False
-            st.rerun()
-    
-    st.markdown("---")
-    
-    # Email Method
-    if st.session_state.auth_method == 'email':
-        st.markdown("**📧 Email Login**")
+    # Main Auth Form
+    if st.session_state.auth_mode == 'login':
+        # LOGIN FORM
+        st.markdown("### 📧 Sign In")
         
-        email = st.text_input("Email", placeholder="Enter your email", key="email_input")
-        password = st.text_input("Password", type="password", placeholder="Enter password", key="email_password")
+        email = st.text_input("Email", placeholder="Enter your email address", key="signin_email")
+        password = st.text_input("Password", type="password", placeholder="Enter your password", key="signin_password")
         
-        col1, col2 = st.columns([2, 1])
+        # Remember me and forgot password
+        col1, col2 = st.columns([1, 1])
         with col1:
-            if st.button("🚀 Sign In", key="email_signin", use_container_width=True, type="primary"):
-                if not email or not password:
-                    st.error("❌ Please fill all fields!")
-                elif not is_valid_email(email):
-                    st.error("❌ Invalid email format!")
-                else:
-                    success, name = authenticate_email(email, password)
-                    if success:
-                        st.session_state.authenticated = True
-                        st.session_state.username = name
-                        st.session_state.show_login_modal = False
-                        st.success(f"✅ Welcome, {name}!")
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid credentials!")
-        
+            remember_me = st.checkbox("Remember me", key="remember")
         with col2:
-            if st.button("📝 Register", key="email_register", use_container_width=True):
-                st.info("📝 Registration coming soon!")
-    
-    # Phone Method
-    elif st.session_state.auth_method == 'phone':
-        if not st.session_state.otp_sent:
-            st.markdown("**📱 Phone Login**")
-            
-            phone = st.text_input("Phone Number", placeholder="Enter 10-digit number", key="phone_input", max_chars=10)
-            
-            if st.button("📨 Send OTP", key="send_otp", use_container_width=True, type="primary"):
-                if not phone:
-                    st.error("❌ Enter phone number!")
-                elif not is_valid_phone(phone):
-                    st.error("❌ Invalid phone number!")
-                else:
-                    otp = generate_otp()
-                    st.session_state.current_otp = otp
-                    st.session_state.phone_for_otp = phone
-                    st.session_state.otp_sent = True
-                    st.success(f"📱 OTP sent to {phone}! (Demo OTP: {otp})")
+            if st.button("Forgot password?", key="forgot_pass"):
+                st.info("🔄 Password reset link sent to your email!")
+        
+        # Sign in button
+        if st.button("🚀 Sign In", key="signin_submit", use_container_width=True, type="primary"):
+            if not email or not password:
+                st.error("❌ Please fill in all fields!")
+            elif not is_valid_email(email):
+                st.error("❌ Please enter a valid email address!")
+            else:
+                success, name = authenticate_email(email, password)
+                if success:
+                    st.session_state.authenticated = True
+                    st.session_state.username = name
+                    st.session_state.show_login_modal = False
+                    st.success(f"✅ Welcome back, {name}!")
                     st.rerun()
-        else:
-            st.markdown(f"**🔐 Enter OTP sent to {st.session_state.phone_for_otp}**")
-            
-            otp_input = st.text_input("OTP", placeholder="Enter 6-digit OTP", key="otp_input", max_chars=6)
-            
-            col1, col2 = st.columns([2, 1])
-            with col1:
-                if st.button("✅ Verify", key="verify_otp", use_container_width=True, type="primary"):
-                    if otp_input == st.session_state.current_otp:
-                        name = USER_DB["phones"].get(st.session_state.phone_for_otp, {}).get("name", "Phone User")
-                        st.session_state.authenticated = True
-                        st.session_state.username = name
-                        st.session_state.show_login_modal = False
-                        st.success(f"✅ Welcome, {name}!")
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid OTP!")
-            
-            with col2:
-                if st.button("🔄 Resend", key="resend_otp", use_container_width=True):
-                    new_otp = generate_otp()
-                    st.session_state.current_otp = new_otp
-                    st.info(f"📨 New OTP: {new_otp}")
+                else:
+                    st.error("❌ Invalid email or password!")
+        
+        # Sign up link
+        st.markdown("""
+        <div class="signup-link">
+            Don't have an account? <a href="#" onclick="document.getElementById('signup_tab').click()">Sign up</a>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    else:
+        # SIGNUP FORM
+        st.markdown("### 📝 Create Account")
+        
+        name = st.text_input("Full Name", placeholder="Enter your full name", key="signup_name")
+        email = st.text_input("Email", placeholder="Enter your email address", key="signup_email")
+        password = st.text_input("Password", type="password", placeholder="Create a password (min 8 chars)", key="signup_password")
+        confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password", key="confirm_password")
+        
+        # Terms and conditions
+        terms_accepted = st.checkbox("I agree to the Terms of Service and Privacy Policy", key="terms")
+        
+        # Sign up button
+        if st.button("🎯 Create Account", key="signup_submit", use_container_width=True, type="primary"):
+            if not all([name, email, password, confirm_password]):
+                st.error("❌ Please fill in all fields!")
+            elif not is_valid_email(email):
+                st.error("❌ Please enter a valid email address!")
+            elif len(password) < 8:
+                st.error("❌ Password must be at least 8 characters!")
+            elif password != confirm_password:
+                st.error("❌ Passwords do not match!")
+            elif not terms_accepted:
+                st.error("❌ Please accept the terms and conditions!")
+            elif email in USER_DB["emails"]:
+                st.error("❌ Email already registered! Try signing in instead.")
+            else:
+                # Register new user
+                USER_DB["emails"][email] = {"password": password, "name": name}
+                st.success("✅ Account created successfully! Please sign in.")
+                st.session_state.auth_mode = 'login'
+                st.rerun()
+        
+        # Sign in link
+        st.markdown("""
+        <div class="signup-link">
+            Already have an account? <a href="#" onclick="document.getElementById('signin_tab').click()">Sign in</a>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Close button
     st.markdown("---")
-    if st.button("❌ Close", key="close_auth", use_container_width=True):
+    if st.button("❌ Close", key="close_modal", use_container_width=True):
         st.session_state.show_login_modal = False
         st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# HEADER - Centered title with larger size
+# HEADER - Use existing Sign In button functionality
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="document.getElementById('user-menu-hidden').click()">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
-        <span onclick="document.getElementById('user-menu-btn').click()">{st.session_state.username}</span>
+        {st.session_state.username}
     </div>'''
 else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button onclick="document.getElementById('login-trigger-btn').click()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Sign In</button>
+        <button onclick="document.getElementById('signin-btn-hidden').click()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Sign In</button>
     </div>'''
 
 st.markdown(f"""
@@ -342,30 +422,38 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# HIDDEN CONTROL BUTTONS (completely invisible)
+st.markdown('<div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">', unsafe_allow_html=True)
+
+# Hidden Sign In trigger
+if st.button("Hidden Sign In", key="signin-btn-hidden"):
+    st.session_state.show_login_modal = True
+    st.rerun()
+
+# Hidden user menu
+if st.button("Hidden User Menu", key="user-menu-hidden"):
+    if st.session_state.authenticated:
+        if st.button("🚪 Sign Out", key="signout-hidden"):
+            st.session_state.authenticated = False
+            st.session_state.username = ""
+            st.session_state.page = 'home'
+            st.session_state.show_login_modal = False
+            st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
+
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Hidden trigger buttons
-col1, col2 = st.columns([1, 1])
-with col1:
-    if st.button("Login Trigger", key="login-trigger-btn"):
-        st.session_state.show_login_modal = True
-        st.rerun()
-
-with col2:
-    if st.button("User Menu", key="user-menu-btn"):
-        if st.session_state.authenticated:
-            if st.button("🚪 Sign Out", key="logout_btn"):
-                st.session_state.authenticated = False
-                st.session_state.username = ""
-                st.session_state.page = 'home'
-                st.session_state.show_login_modal = False
-                st.rerun()
-
-# Show professional login modal
+# Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
-    show_professional_login()
+    show_real_world_login()
     st.stop()
+
+# User logout menu (visible when clicked)
+if st.session_state.authenticated:
+    # Simple logout option (you can expand this)
+    pass
 
 # Dashboard Routing (your existing code)
 if st.session_state.page == 'tech':
