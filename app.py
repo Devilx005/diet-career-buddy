@@ -149,7 +149,7 @@ def show_login_modal():
     - 👨‍💼 admin@diet.com / admin123
     """)
 
-# HEADER with CORRECTLY POSITIONED LOGIN BUTTON
+# SIMPLE HEADER
 if st.session_state.authenticated:
     header_html = f'''
     <div style="
@@ -174,7 +174,7 @@ if st.session_state.authenticated:
     </div>
     '''
 else:
-    header_html = f'''
+    header_html = '''
     <div style="
         position: fixed; 
         top: 0; 
@@ -190,9 +190,7 @@ else:
     ">
         <div style="width: 40px;"></div>
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
-        <div style="width: 200px; text-align: right;">
-            <button onclick="openLoginModal()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Login</button>
-        </div>
+        <div style="width: 200px; text-align: right;" id="login-button-placeholder"></div>
     </div>
     '''
 
@@ -201,75 +199,60 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# HIDDEN LOGIN TRIGGER (completely invisible but functional)
+# THE ONLY LOGIN BUTTON - MOVE IT TO HEADER
 if not st.session_state.authenticated:
-    # Create hidden but functional Streamlit button
-    login_clicked = st.button("🔓 Hidden Login Trigger", key="login_trigger_hidden", help="Hidden")
-    
-    if login_clicked:
+    if st.button("Login", key="main_login_btn", type="primary"):
         st.session_state.show_login_modal = True
         st.rerun()
     
-    # JavaScript and CSS to connect header button and hide trigger
+    # CSS to MOVE the existing Login button to header position
     st.markdown("""
     <script>
-    function openLoginModal() {
-        // Find and click the hidden Streamlit button
-        const buttons = parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.title === 'Hidden' || btn.textContent.includes('Hidden Login Trigger')) {
-                btn.click();
-            }
-        });
-    }
-    
-    // Hide the trigger button completely
     setTimeout(function() {
+        // Find the Login button
         const buttons = parent.document.querySelectorAll('button');
+        let loginBtn = null;
+        
         buttons.forEach(btn => {
-            if (btn.title === 'Hidden' || btn.textContent.includes('Hidden Login Trigger')) {
-                // Hide button and its container
-                btn.style.cssText = 'display: none !important; position: absolute !important; left: -9999px !important; visibility: hidden !important; width: 0 !important; height: 0 !important;';
-                if (btn.parentElement) {
-                    btn.parentElement.style.cssText = 'display: none !important; position: absolute !important; left: -9999px !important; visibility: hidden !important; width: 0 !important; height: 0 !important;';
-                }
+            if (btn.textContent.trim() === 'Login' && btn.getAttribute('data-testid')) {
+                loginBtn = btn;
             }
         });
-    }, 100);
+        
+        if (loginBtn) {
+            // Style and position the Login button in header
+            loginBtn.style.cssText = `
+                position: fixed !important;
+                top: 12px !important;
+                right: 20px !important;
+                background: #10a37f !important;
+                color: white !important;
+                border: none !important;
+                padding: 10px 18px !important;
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+                font-size: 14px !important;
+                z-index: 1001 !important;
+                cursor: pointer !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+                transition: all 0.3s ease !important;
+            `;
+            
+            // Hide the original container
+            if (loginBtn.parentElement) {
+                loginBtn.parentElement.style.cssText = 'opacity: 0; position: absolute; left: -9999px;';
+            }
+        }
+    }, 500);
     </script>
-    
-    <style>
-    /* Multiple approaches to hide the trigger button */
-    button[title="Hidden"], 
-    button:contains("🔓 Hidden Login Trigger"),
-    .element-container:has(button[title="Hidden"]) {
-        display: none !important;
-        position: absolute !important;
-        left: -9999px !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-        opacity: 0 !important;
-        z-index: -9999 !important;
-    }
-    </style>
     """, unsafe_allow_html=True)
-
-# Handle logout via URL parameter
-if st.query_params.get("logout") == "1":
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.session_state.page = 'home'
-    st.session_state.show_login_modal = False
-    st.query_params.clear()
-    st.rerun()
 
 # Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
     show_login_modal()
     st.stop()
 
-# Dashboard Routing
+# Dashboard Routing (your existing code)
 if st.session_state.page == 'tech':
     tech_dashboard.show()
     if st.button("🏠 Back to Home", key="back_tech"):
@@ -316,7 +299,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons
+    # Navigation Buttons (your existing buttons)
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
@@ -384,7 +367,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Chat Section
+    # Chat Section (your existing chat)
     st.markdown("### 💬 **Ask Your Career Questions!**")
     
     col_input, col_button = st.columns([4, 1])
