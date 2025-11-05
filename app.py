@@ -59,7 +59,7 @@ def show_login_form():
     
     st.info("**Demo Login:** username: `admin` | password: `password`")
 
-# CLEAN HEADER - NO USELESS ICONS
+# CLEAN HEADER - NO USELESS DECORATIVE ICONS
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -98,7 +98,7 @@ if st.session_state.logged_in:
     </div>
     '''
 else:
-    # CLEAN HEADER - NO USELESS USER ICON
+    # CLEAN HEADER - NO DECORATIVE ICONS
     header_html = '''
     <div style="
         position: fixed; 
@@ -120,7 +120,7 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="width: 200px; text-align: right;">
-            <!-- NO USELESS ICONS HERE -->
+            <!-- NO DECORATIVE ICONS HERE -->
         </div>
     </div>
     '''
@@ -129,6 +129,12 @@ st.markdown(header_html, unsafe_allow_html=True)
 
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
+
+# WORKING LOGIN TRIGGER - ALWAYS VISIBLE (NOT HIDDEN)
+if not st.session_state.logged_in:
+    if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
+        st.session_state.show_login_form = True
+        st.rerun()
 
 # Show optional login form when triggered
 if st.session_state.show_login_form:
