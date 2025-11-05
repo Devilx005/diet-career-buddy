@@ -34,21 +34,36 @@ USERS = {"student": "password123", "demo": "demo123", "admin": "admin123", "diet
 def authenticate_user(username, password):
     return username in USERS and USERS[username] == password
 
-# HEADER - Clean with proper hamburger positioning
+# HEADER - Centered title with larger size
 if st.session_state.authenticated:
-    header_text = f"☰ 🎓 DIET Career Buddy"
-    user_display = f'<div style="color: #a0aec0; font-size: 14px;"><span style="background: #10a37f; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>{st.session_state.username}</div>'
-    right_section = user_display
+    left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
+    title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
+    user_display = f'<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right;"><span style="background: #10a37f; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>{st.session_state.username}</div>'
 else:
-    header_text = "🎓 DIET Career Buddy"
-    right_section = '<button onclick="window.showLogin=true" style="background: #10a37f; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">Log in</button>'
+    left_section = '<div style="width: 40px;"></div>'  # Empty space to balance
+    title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
+    user_display = '<div style="width: 200px; text-align: right;"><button onclick="window.showLogin=true" style="background: #10a37f; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">Log in</button></div>'
 
 st.markdown(f"""
-<div style="position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #212121; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000;">
-    <div style="font-size: 1.1em; font-weight: 600; color: #10a37f;">{header_text}</div>
-    <div>{right_section}</div>
+<div style="
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    height: 50px; 
+    background: #212121; 
+    border-bottom: 1px solid #444; 
+    display: flex; 
+    align-items: center; 
+    padding: 0 20px; 
+    z-index: 1000;
+">
+    {left_section}
+    {title_section}
+    {user_display}
 </div>
 """, unsafe_allow_html=True)
+
 
 # MAIN CONTENT - Moved closer to title bar (reduced margin)
 st.markdown('<div style="margin-top: 10px;">', unsafe_allow_html=True)
