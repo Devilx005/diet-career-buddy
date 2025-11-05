@@ -51,7 +51,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # MAIN CONTENT - Moved closer to title bar (reduced margin)
-st.markdown('<div style="margin-top: 40px;">', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 10px;">', unsafe_allow_html=True)
 
 # Simple login handling through URL parameters or session
 if not st.session_state.authenticated:
