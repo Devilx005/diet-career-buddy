@@ -199,13 +199,13 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# THE ONLY LOGIN BUTTON - MOVE IT TO HEADER
+# THE ONLY LOGIN BUTTON - MOVE IT TO TOP RIGHT CORNER + GREEN
 if not st.session_state.authenticated:
     if st.button("Login", key="main_login_btn", type="primary"):
         st.session_state.show_login_modal = True
         st.rerun()
     
-    # CSS to MOVE the existing Login button to header position
+    # CSS to MOVE the existing Login button to RIGHT CORNER and make it GREEN
     st.markdown("""
     <script>
     setTimeout(function() {
@@ -220,7 +220,7 @@ if not st.session_state.authenticated:
         });
         
         if (loginBtn) {
-            // Style and position the Login button in header
+            // Style and position the Login button in TOP RIGHT CORNER with GREEN color
             loginBtn.style.cssText = `
                 position: fixed !important;
                 top: 12px !important;
@@ -234,17 +234,93 @@ if not st.session_state.authenticated:
                 font-size: 14px !important;
                 z-index: 1001 !important;
                 cursor: pointer !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+                box-shadow: 0 2px 8px rgba(16, 163, 127, 0.3) !important;
                 transition: all 0.3s ease !important;
+                transform: translateY(0) !important;
             `;
             
-            // Hide the original container
+            // Add hover effect
+            loginBtn.addEventListener('mouseenter', function() {
+                this.style.background = '#0d8f6b !important';
+                this.style.transform = 'translateY(-2px) !important';
+                this.style.boxShadow = '0 4px 12px rgba(16, 163, 127, 0.4) !important';
+            });
+            
+            loginBtn.addEventListener('mouseleave', function() {
+                this.style.background = '#10a37f !important';
+                this.style.transform = 'translateY(0) !important';
+                this.style.boxShadow = '0 2px 8px rgba(16, 163, 127, 0.3) !important';
+            });
+            
+            // Hide the original container completely
             if (loginBtn.parentElement) {
-                loginBtn.parentElement.style.cssText = 'opacity: 0; position: absolute; left: -9999px;';
+                loginBtn.parentElement.style.cssText = 'opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;';
+            }
+            
+            // Also hide any parent containers
+            let parent = loginBtn.parentElement;
+            while (parent) {
+                if (parent.tagName === 'DIV' && parent.style) {
+                    parent.style.cssText += 'opacity: 0 !important; position: absolute !important; left: -9999px !important;';
+                }
+                parent = parent.parentElement;
+                if (parent && parent.tagName === 'MAIN') break; // Stop at main container
             }
         }
     }, 500);
+    
+    // Additional cleanup every 2 seconds to ensure button stays in position
+    setInterval(function() {
+        const buttons = parent.document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            if (btn.textContent.trim() === 'Login' && btn.style.position === 'fixed') {
+                // Ensure it stays in the right position with green color
+                if (btn.style.right !== '20px' || btn.style.background !== 'rgb(16, 163, 127)') {
+                    btn.style.cssText = `
+                        position: fixed !important;
+                        top: 12px !important;
+                        right: 20px !important;
+                        background: #10a37f !important;
+                        color: white !important;
+                        border: none !important;
+                        padding: 10px 18px !important;
+                        border-radius: 8px !important;
+                        font-weight: 600 !important;
+                        font-size: 14px !important;
+                        z-index: 1001 !important;
+                        cursor: pointer !important;
+                        box-shadow: 0 2px 8px rgba(16, 163, 127, 0.3) !important;
+                        transition: all 0.3s ease !important;
+                    `;
+                }
+            }
+        });
+    }, 2000);
     </script>
+    
+    <style>
+    /* Additional CSS to ensure proper positioning */
+    button[data-testid*="button"]:contains("Login") {
+        position: fixed !important;
+        top: 12px !important;
+        right: 20px !important;
+        background: #10a37f !important;
+        z-index: 1001 !important;
+    }
+    
+    /* Hide any duplicate login buttons */
+    .element-container:has(button:contains("Login")) {
+        opacity: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+    
+    .element-container:has(button[style*="position: fixed"]) {
+        opacity: 1 !important;
+        position: static !important;
+        left: auto !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
 # Show login modal when triggered
@@ -252,7 +328,7 @@ if st.session_state.show_login_modal and not st.session_state.authenticated:
     show_login_modal()
     st.stop()
 
-# Dashboard Routing (your existing code)
+# Dashboard Routing
 if st.session_state.page == 'tech':
     tech_dashboard.show()
     if st.button("🏠 Back to Home", key="back_tech"):
@@ -299,7 +375,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons (your existing buttons)
+    # Navigation Buttons
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
@@ -367,7 +443,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Chat Section (your existing chat)
+    # Chat Section
     st.markdown("### 💬 **Ask Your Career Questions!**")
     
     col_input, col_button = st.columns([4, 1])
