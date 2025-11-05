@@ -114,19 +114,6 @@ st.markdown("""
     .signup-link a:hover {
         text-decoration: underline;
     }
-
-    /* Hide trigger buttons completely */
-    button[title="Login trigger"], 
-    button[title="Logout trigger"] {
-        display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-        opacity: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -141,6 +128,10 @@ if 'show_login_modal' not in st.session_state:
     st.session_state.show_login_modal = False
 if 'auth_mode' not in st.session_state:
     st.session_state.auth_mode = 'login'
+if 'login_clicked' not in st.session_state:
+    st.session_state.login_clicked = False
+if 'logout_clicked' not in st.session_state:
+    st.session_state.logout_clicked = False
 
 # Enhanced User Database
 USER_DB = {
@@ -215,14 +206,6 @@ def show_login_modal():
         email = st.text_input("Email", placeholder="Enter your email address", key="login_email")
         password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
-        # Remember me and forgot password
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            remember_me = st.checkbox("Remember me", key="remember")
-        with col2:
-            if st.button("Forgot password?", key="forgot_pass"):
-                st.info("🔄 Password reset link sent to your email!")
-        
         # Login button
         if st.button("🚀 Login", key="login_submit", use_container_width=True, type="primary"):
             if not email or not password:
@@ -296,11 +279,23 @@ def show_login_modal():
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
+# Check for login/logout actions via JavaScript
+if st.session_state.login_clicked:
+    st.session_state.show_login_modal = True
+    st.session_state.login_clicked = False
+
+if st.session_state.logout_clicked:
+    st.session_state.authenticated = False
+    st.session_state.username = ""
+    st.session_state.page = 'home'
+    st.session_state.show_login_modal = False
+    st.session_state.logout_clicked = False
+
 # HEADER with DIRECTLY FUNCTIONAL Login Button
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="logout()">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="triggerLogout()">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
@@ -308,7 +303,7 @@ else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button onclick="openLogin()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <button onclick="triggerLogin()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
     </div>'''
 
 st.markdown(f"""
@@ -334,44 +329,35 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# HIDDEN TRIGGER BUTTONS (completely invisible)
-if st.button("🔓", key="header_login_trigger", help="Login trigger"):
-    st.session_state.show_login_modal = True
-    st.rerun()
-
-if st.button("🚪", key="header_logout_trigger", help="Logout trigger"):
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.session_state.page = 'home'
-    st.session_state.show_login_modal = False
-    st.rerun()
-
-# JavaScript to make the GREEN LOGIN BUTTON work
+# JavaScript to handle login/logout directly with session state
 st.markdown("""
 <script>
-function openLogin() {
-    // Find the hidden login trigger button
-    const buttons = parent.document.querySelectorAll('button');
-    buttons.forEach(btn => {
-        if (btn.title === 'Login trigger') {
-            btn.click();
-        }
-    });
+function triggerLogin() {
+    // Set session state via URL parameter
+    window.location.href = window.location.href.split('?')[0] + '?action=login';
 }
 
-function logout() {
+function triggerLogout() {
     if (confirm('Sign out?')) {
-        // Find the hidden logout trigger button
-        const buttons = parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.title === 'Logout trigger') {
-                btn.click();
-            }
-        });
+        // Set session state via URL parameter
+        window.location.href = window.location.href.split('?')[0] + '?action=logout';
     }
 }
 </script>
 """, unsafe_allow_html=True)
+
+# Handle URL parameters for login/logout
+action = st.query_params.get("action")
+if action == "login":
+    st.session_state.show_login_modal = True
+    st.query_params.clear()
+elif action == "logout":
+    st.session_state.authenticated = False
+    st.session_state.username = ""
+    st.session_state.page = 'home'
+    st.session_state.show_login_modal = False
+    st.query_params.clear()
+    st.rerun()
 
 # Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
