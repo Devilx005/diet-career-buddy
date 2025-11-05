@@ -4,7 +4,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# MOBILE-OPTIMIZED CSS - 2 buttons per row on mobile
+# FIXED CSS - Single button set with responsive behavior
 st.markdown("""
 <style>
     .main .block-container { 
@@ -45,7 +45,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* DESKTOP - 6 buttons in one row */
+    /* RESPONSIVE BUTTON GRID - Changes layout based on screen size */
     .stColumns { 
         gap: 0.5rem !important; 
     }
@@ -96,35 +96,22 @@ st.markdown("""
         margin: 4px !important;
     }
     
-    /* MOBILE - 2 buttons per row (3 rows total) */
+    /* MOBILE OPTIMIZATION - 3 columns instead of 6 */
     @media (max-width: 768px) {
-        .mobile-button-container {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
-            margin: 1rem 0 !important;
-        }
-        
-        .mobile-button-container .stButton > button {
-            height: 55px !important;
-            font-size: 9px !important;
-            padding: 4px !important;
-        }
-        
-        .desktop-buttons {
-            display: none !important;
-        }
-        
         .header {
             font-size: 16px !important;
             padding: 12px !important;
         }
-    }
-    
-    /* DESKTOP - Hide mobile buttons */
-    @media (min-width: 769px) {
-        .mobile-button-container {
-            display: none !important;
+        
+        .stButton > button {
+            height: 50px !important;
+            font-size: 9px !important;
+            padding: 4px 2px !important;
+        }
+        
+        /* This will make Streamlit show 3 buttons per row on mobile */
+        .stColumn {
+            min-width: 30% !important;
         }
     }
     
@@ -168,8 +155,7 @@ if 'page' not in st.session_state:
 # Header
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# DESKTOP Navigation Buttons (6 in a row)
-st.markdown('<div class="desktop-buttons">', unsafe_allow_html=True)
+# SINGLE SET OF BUTTONS - Will automatically adapt to mobile
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -202,50 +188,7 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
-
-# MOBILE Navigation Buttons (2 per row = 3 rows)
-st.markdown('<div class="mobile-button-container">', unsafe_allow_html=True)
-
-# Row 1: Tech Careers + Live Salary
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("💻 Tech Careers", key="tech_mobile"):
-        st.session_state.page = 'tech'
-        st.rerun()
-
-with col2:
-    if st.button("💰 Live Salary", key="salary_mobile"):
-        st.session_state.page = 'salary'
-        st.rerun()
-
-# Row 2: Learning Paths + DIET Guide  
-col3, col4 = st.columns(2)
-with col3:
-    if st.button("📚 Learning Paths", key="learn_mobile"):
-        st.session_state.page = 'learn'
-        st.rerun()
-
-with col4:
-    if st.button("🎓 DIET Guide", key="diet_mobile"):
-        st.session_state.page = 'diet'
-        st.rerun()
-
-# Row 3: Interview Prep + Live Jobs
-col5, col6 = st.columns(2)
-with col5:
-    if st.button("🎯 Interview Prep", key="interview_mobile"):
-        st.session_state.page = 'interview'
-        st.rerun()
-
-with col6:
-    if st.button("📊 Live Jobs", key="jobs_mobile"):
-        st.session_state.page = 'jobs'
-        st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Content with better spacing
+# Content
 if st.session_state.page == 'jobs':
     st.markdown("## 📊 **Live Job Market Dashboard**")
     
@@ -293,7 +236,7 @@ elif st.session_state.page == 'salary':
         st.rerun()
 
 else:
-    # Home Page with optimized spacing
+    # Home Page
     st.markdown('<div class="main-title">', unsafe_allow_html=True)
     st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -325,10 +268,6 @@ else:
             response += "💰 Check the **Live Salary** dashboard for real-time data!"
         elif any(word in user_input.lower() for word in ['job', 'hiring', 'market']):
             response += "📊 Visit the **Live Jobs** dashboard for market insights!"
-        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course']):
-            response += "📚 Explore the **Learning Paths** dashboard for skill development!"
-        elif any(word in user_input.lower() for word in ['interview', 'preparation']):
-            response += "🎯 Check the **Interview Prep** dashboard for preparation tips!"
         else:
             response += "🎓 Click any dashboard button above for detailed insights!"
         
