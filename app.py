@@ -4,97 +4,146 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# SAFE CSS - Working version with gap fixes only
+# PRECISE CSS - Fix overlapping and gaps
 st.markdown("""
 <style>
+    /* AGGRESSIVE removal of ALL Streamlit spacing */
     .main .block-container { 
         padding-top: 0rem !important; 
         padding-left: 0rem !important; 
         padding-right: 0rem !important; 
+        padding-bottom: 0rem !important;
         margin-top: 0rem !important;
+        margin-left: 0rem !important;
+        margin-right: 0rem !important;
+        max-width: 100% !important;
+        width: 100% !important;
     }
     .stApp > header { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     .stDeployButton { display: none !important; }
     section[data-testid="stSidebar"] { display: none !important; }
     
+    /* FORCE full width, no margins */
     body { 
         background: #212121 !important; 
         color: white !important; 
         margin: 0 !important; 
         padding: 0 !important; 
+        width: 100vw !important;
+        overflow-x: hidden !important;
     }
     .stApp { 
         background: #212121 !important; 
-        margin-top: -80px !important;
+        margin-top: -100px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 0 !important;
+        width: 100vw !important;
     }
     
-    /* Remove gaps between elements */
+    /* Remove ALL gaps between elements */
     div[data-testid="stVerticalBlock"] { 
         gap: 0rem !important; 
-        margin-bottom: 0rem !important;
+        margin: 0rem !important;
+        padding: 0rem !important;
+        width: 100% !important;
     }
     div[data-testid="stHorizontalBlock"] { 
         gap: 0rem !important; 
-        margin-bottom: 0rem !important;
+        margin: 0rem !important;
+        padding: 0rem !important;
+        width: 100% !important;
     }
     .element-container { 
         margin: 0rem !important; 
         padding: 0rem !important; 
+        width: 100% !important;
     }
+    
+    /* FIX BUTTON OVERLAPPING - Proper spacing */
     .stColumns { 
-        gap: 0rem !important; 
+        gap: 6px !important; 
         margin: 0rem !important; 
+        padding: 0rem !important;
+        width: 100% !important;
     }
     .stColumn { 
         padding: 0rem !important; 
         margin: 0rem !important; 
+        min-width: 0 !important;
+        flex: 1 !important;
     }
     
+    /* HEADER - Full width, no gaps */
     .header { 
         background: linear-gradient(135deg, #303030, #424242); 
-        padding: 18px; 
+        padding: 18px 20px; 
         text-align: center; 
         font-weight: bold; 
         border-bottom: 3px solid #10a37f; 
-        font-size: 22px;
+        font-size: 20px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         margin: 0;
+        width: 100vw;
+        position: relative;
+        left: 0;
+        right: 0;
     }
     
-    .content { 
-        padding: 25px; 
-        background: #212121;
-        margin: 0 !important;
+    /* BUTTON CONTAINER - Full width */
+    .button-section {
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        padding: 10px 15px;
+        margin: 0;
+        width: 100vw;
+        position: relative;
+        left: 0;
+        right: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     
+    /* BUTTONS - Fixed spacing, no overlap */
     .stButton > button { 
         background: linear-gradient(135deg, #424242, #525252) !important; 
         color: white !important; 
         border: 1px solid #555 !important; 
         width: 100% !important;
-        height: 75px !important;
-        border-radius: 10px !important;
+        height: 70px !important;
+        border-radius: 8px !important;
         font-weight: 600 !important;
-        font-size: 12px !important;
+        font-size: 10px !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-        margin: 2px !important;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+        margin: 0 !important;
+        padding: 4px !important;
+        line-height: 1.2 !important;
     }
     
     .stButton > button:hover { 
         background: linear-gradient(135deg, #10a37f, #0d8f6b) !important; 
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(16, 163, 127, 0.4) !important;
+        box-shadow: 0 6px 18px rgba(16, 163, 127, 0.4) !important;
+    }
+    
+    /* CONTENT - Full width, no gaps */
+    .content { 
+        padding: 25px 20px; 
+        background: #212121;
+        margin: 0 !important;
+        width: 100vw;
+        position: relative;
+        left: 0;
+        right: 0;
     }
     
     .feature-card {
         background: linear-gradient(135deg, #303030, #424242);
-        padding: 22px;
-        border-radius: 12px;
-        border-left: 5px solid #10a37f;
-        margin: 18px 0;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #10a37f;
+        margin: 15px 0;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
     }
     
     .stTextInput input {
@@ -102,21 +151,32 @@ st.markdown("""
         color: white !important;
         border: 1px solid #555 !important;
         border-radius: 8px !important;
-        padding: 12px !important;
+        padding: 10px !important;
+        width: 100% !important;
     }
     
     .stMetric {
         background: linear-gradient(135deg, #303030, #424242) !important;
         border: 1px solid #555 !important;
-        border-radius: 10px !important;
-        padding: 18px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-        margin: 6px !important;
+        border-radius: 8px !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        margin: 4px !important;
+    }
+    
+    /* Mobile responsive - prevent overlap */
+    @media (max-width: 768px) {
+        .stColumns { gap: 3px !important; }
+        .stButton > button { 
+            font-size: 9px !important; 
+            height: 60px !important; 
+            padding: 2px !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# API Functions (same as before)
+# API Functions
 @st.cache_data(ttl=1800)
 def get_live_job_data():
     try:
@@ -140,19 +200,21 @@ def get_live_job_data():
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# Header
+# HEADER - Edge to edge
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# Navigation Buttons
+# BUTTON SECTION - Edge to edge with proper spacing
+st.markdown('<div class="button-section">', unsafe_allow_html=True)
+
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    if st.button("💻\nTech Careers\n& Trends", key="tech"):
+    if st.button("💻\nTech\nCareers", key="tech"):
         st.session_state.page = 'tech'
         st.rerun()
 
 with col2:
-    if st.button("💰\nLive Salary\n& Market", key="salary"):
+    if st.button("💰\nLive\nSalary", key="salary"):
         st.session_state.page = 'salary'
         st.rerun()
 
@@ -162,7 +224,7 @@ with col3:
         st.rerun()
 
 with col4:
-    if st.button("🎓\nDIET Guide\n& Tips", key="diet"):
+    if st.button("🎓\nDIET\nGuide", key="diet"):
         st.session_state.page = 'diet'
         st.rerun()
 
@@ -172,11 +234,13 @@ with col5:
         st.rerun()
 
 with col6:
-    if st.button("📊\nLive Jobs\nAPI Data", key="jobs"):
+    if st.button("📊\nLive\nJobs", key="jobs"):
         st.session_state.page = 'jobs'
         st.rerun()
 
-# Content Area
+st.markdown('</div>', unsafe_allow_html=True)
+
+# CONTENT - Edge to edge, no gaps
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
 if st.session_state.page == 'jobs':
@@ -194,10 +258,15 @@ if st.session_state.page == 'jobs':
         st.metric("Last Updated", job_data['updated'], "Real-time")
     
     st.markdown("### 🔥 **Trending Job Categories**")
-    st.write("• **Software Development**: 3,200+ active openings")
-    st.write("• **Data Science & Analytics**: 1,800+ positions available")
-    st.write("• **DevOps & Cloud Engineering**: 1,200+ roles")
-    st.write("• **AI/ML Engineering**: 900+ opportunities")
+    categories = [
+        "💻 **Software Development**: 3,200+ active openings",
+        "📊 **Data Science & Analytics**: 1,800+ positions available",
+        "☁️ **DevOps & Cloud Engineering**: 1,200+ roles",
+        "🤖 **AI/ML Engineering**: 900+ opportunities"
+    ]
+    
+    for category in categories:
+        st.write(f"• {category}")
     
     if st.button("← Back to Home", key="back_jobs"):
         st.session_state.page = 'home'
@@ -211,11 +280,11 @@ elif st.session_state.page == 'salary':
     st.markdown("### 💼 **Current Salary Ranges**")
     
     roles = [
-        "**Software Engineer**: ₹4-25 LPA ↗️",
-        "**Data Scientist**: ₹6-30 LPA ↗️",
-        "**DevOps Engineer**: ₹5-28 LPA ↗️", 
-        "**Product Manager**: ₹8-45 LPA ↗️",
-        "**AI/ML Engineer**: ₹7-35 LPA ↗️"
+        "💻 **Software Engineer**: ₹4-25 LPA ↗️",
+        "📊 **Data Scientist**: ₹6-30 LPA ↗️",
+        "☁️ **DevOps Engineer**: ₹5-28 LPA ↗️", 
+        "📱 **Product Manager**: ₹8-45 LPA ↗️",
+        "🤖 **AI/ML Engineer**: ₹7-35 LPA ↗️"
     ]
     
     for role in roles:
@@ -236,7 +305,7 @@ else:
         • <strong>Real-Time APIs:</strong> Live job market data from GitHub & CoinGecko<br>
         • <strong>DIET-Specific Guidance:</strong> Tailored advice for engineering students<br>
         • <strong>Interactive Dashboards:</strong> 6 comprehensive career analysis tools<br>
-        • <strong>Professional Design:</strong> Zero-gap, seamless interface<br>
+        • <strong>Edge-to-Edge Design:</strong> Zero gaps, professional interface<br>
         • <strong>Market Intelligence:</strong> AI-powered career insights
     </div>
     """, unsafe_allow_html=True)
