@@ -59,7 +59,7 @@ def show_login_form():
     
     st.info("**Demo Login:** username: `admin` | password: `password`")
 
-# HEADER WITH LOGIN ICON IN RIGHT CORNER OF TITLE BAR
+# HEADER WITH LOGIN TRIGGER IN RIGHT CORNER OF TITLE BAR
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -78,26 +78,23 @@ if st.session_state.logged_in:
         <div style="width: 40px; display: flex; align-items: center;">
             <span style="color: #a0aec0; cursor: pointer;">☰</span>
         </div>
-        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1; position: relative;">
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
+        </div>
+        <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
             <span style="
-                position: absolute; 
-                top: 50%; 
-                right: -100px; 
-                transform: translateY(-50%); 
                 color: #a0aec0; 
                 cursor: pointer; 
                 font-size: 14px;
                 background: rgba(16, 163, 127, 0.1);
-                padding: 4px 8px;
-                border-radius: 4px;
+                padding: 6px 12px;
+                border-radius: 6px;
                 border: 1px solid rgba(16, 163, 127, 0.3);
             " 
             onclick="if(confirm('Logout?')) window.location.reload()">
                 👋 {st.session_state.username}
             </span>
         </div>
-        <div style="width: 100px;"></div>
     </div>
     '''
 else:
@@ -118,19 +115,17 @@ else:
         <div style="width: 40px; display: flex; align-items: center;">
             <span style="color: #a0aec0; cursor: pointer;">☰</span>
         </div>
-        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1; position: relative;">
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
+        </div>
+        <div style="width: 200px; text-align: right; display: flex; align-items: center; justify-content: flex-end;">
             <span style="
-                position: absolute; 
-                top: 50%; 
-                right: -50px; 
-                transform: translateY(-50%); 
                 cursor: pointer; 
                 font-size: 18px;
                 color: #10a37f;
                 background: rgba(16, 163, 127, 0.1);
-                width: 32px;
-                height: 32px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -139,12 +134,11 @@ else:
                 transition: all 0.3s ease;
             " 
             onclick="triggerLogin()"
-            onmouseover="this.style.background='rgba(16, 163, 127, 0.2)'; this.style.transform='translateY(-50%) scale(1.1)'"
-            onmouseout="this.style.background='rgba(16, 163, 127, 0.1)'; this.style.transform='translateY(-50%) scale(1)'">
+            onmouseover="this.style.background='rgba(16, 163, 127, 0.2)'; this.style.transform='scale(1.1)'"
+            onmouseout="this.style.background='rgba(16, 163, 127, 0.1)'; this.style.transform='scale(1)'">
                 👤
             </span>
         </div>
-        <div style="width: 50px;"></div>
     </div>
     
     <script>
