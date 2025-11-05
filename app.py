@@ -366,45 +366,44 @@ else:
     st.markdown(f"## 🎓 **{welcome_text}**")
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
     
-    if not st.session_state.authenticated:
-        st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
+    # REMOVED THE "SIGN IN TO CONTINUE" MESSAGE COMPLETELY
     
-    # Navigation Buttons - TEMPORARILY DISABLED AUTHENTICATION
+    # Navigation Buttons - DIRECT ACCESS WITHOUT "SIGN IN TO CONTINUE" MESSAGE
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
         if st.button("💻\nTech\nCareers", key="tech"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'tech'
             st.rerun()
 
     with col2:
         if st.button("💰\nLive\nSalary", key="salary"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'salary'
             st.rerun()
 
     with col3:
         if st.button("📚\nLearning\nPaths", key="learn"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'learn'
             st.rerun()
 
     with col4:
         if st.button("🎓\nDIET\nGuide", key="diet"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'diet'
             st.rerun()
 
     with col5:
         if st.button("🎯\nInterview\nPrep", key="interview"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'interview'
             st.rerun()
 
     with col6:
         if st.button("📊\nLive\nJobs", key="jobs"):
-            # TEMPORARILY BYPASS AUTHENTICATION
+            # DIRECT ACCESS - NO "SIGN IN TO CONTINUE" MESSAGE
             st.session_state.page = 'jobs'
             st.rerun()
     
@@ -440,10 +439,6 @@ else:
     
     if send_clicked and user_input.strip():
         response_prefix = f"Great question, {st.session_state.username}! " if st.session_state.authenticated else "Great question! "
-        
-        if not st.session_state.authenticated:
-            response_prefix += "💡 Sign in to access detailed dashboards. Here's some guidance: "
-        
         response = response_prefix + "🎓 Explore our dashboards above for detailed insights!"
         
         st.markdown(f"""
