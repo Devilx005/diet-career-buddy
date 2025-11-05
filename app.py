@@ -149,8 +149,8 @@ if not st.session_state.logged_in:
     <style>
     button[title="working_login_trigger"] {
         position: fixed !important;
-        top: 10px !important;
-        right: 20px !important;
+        top: 0px !important;
+        right: 0px !important;
         z-index: 1001 !important;
     }
     </style>
