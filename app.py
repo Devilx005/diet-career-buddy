@@ -4,9 +4,10 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# TARGETED CSS - Eliminate button-to-content gap
+# ENHANCED CSS - More distinct elements + zero top gap
 st.markdown("""
 <style>
+    /* NUCLEAR REMOVAL of all top spacing */
     .main .block-container { 
         padding-top: 0rem !important; 
         padding-left: 0rem !important; 
@@ -18,122 +19,194 @@ st.markdown("""
     .stDeployButton { display: none !important; }
     section[data-testid="stSidebar"] { display: none !important; }
     
-    body { background: #212121 !important; color: white !important; margin: 0 !important; padding: 0 !important; }
-    .stApp { background: #212121 !important; }
+    /* FORCE app to start from absolute top */
+    body { 
+        background: #212121 !important; 
+        color: white !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+    .stApp { 
+        background: #212121 !important; 
+        margin-top: -200px !important;
+        position: relative;
+        top: 0;
+    }
     
-    /* CRITICAL: Remove gaps after Streamlit columns/buttons */
+    /* Remove ALL gaps */
     div[data-testid="stVerticalBlock"] { 
         gap: 0rem !important; 
-        margin-bottom: 0rem !important;
-        padding-bottom: 0rem !important;
+        margin: 0rem !important;
+        padding: 0rem !important;
     }
-    
     div[data-testid="stHorizontalBlock"] { 
         gap: 0rem !important; 
-        margin-bottom: 0rem !important;
-        padding-bottom: 0rem !important;
+        margin: 0rem !important;
+        padding: 0rem !important;
     }
-    
     .element-container { 
         margin: 0rem !important; 
         padding: 0rem !important; 
-        margin-bottom: 0rem !important;
     }
-    
-    /* Remove spacing from columns containing buttons */
     .stColumns { 
         gap: 0rem !important; 
         margin: 0rem !important; 
-        margin-bottom: 0rem !important;
-        padding-bottom: 0rem !important;
     }
-    
     .stColumn { 
         padding: 0rem !important; 
         margin: 0rem !important; 
-        margin-bottom: 0rem !important;
     }
     
+    /* ENHANCED HEADER - More prominent */
     .header { 
-        background: linear-gradient(135deg, #303030, #424242); 
-        padding: 15px; 
-        text-align: center; 
-        font-weight: bold; 
-        border-bottom: 3px solid #10a37f; 
-        font-size: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        margin: 0;
-        margin-bottom: 0 !important;
-    }
-    
-    .buttons { 
-        display: flex; 
-        gap: 8px; 
-        padding: 12px; 
-        background: #303030; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        margin: 0 !important;
-        margin-bottom: 0 !important;
-    }
-    
-    .content { 
+        background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
         padding: 20px; 
-        background: #212121;
-        margin: 0 !important;
-        margin-top: 0 !important;
-        border-top: none !important;
+        text-align: center; 
+        font-weight: 700; 
+        border-bottom: 4px solid #10a37f; 
+        font-size: 24px;
+        box-shadow: 0 4px 20px rgba(16, 163, 127, 0.3);
+        margin: 0;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
     
+    /* ENHANCED BUTTONS - More distinct */
     .stButton > button { 
-        background: linear-gradient(135deg, #424242, #525252) !important; 
+        background: linear-gradient(145deg, #2d3748, #4a5568) !important; 
         color: white !important; 
-        border: 1px solid #555 !important; 
+        border: 2px solid #4a5568 !important; 
         width: 100% !important;
-        height: 70px !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        font-size: 11px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
-        margin: 0 !important;
-        margin-bottom: 0 !important;
+        height: 80px !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+        margin: 4px !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
     }
     
     .stButton > button:hover { 
-        background: linear-gradient(135deg, #10a37f, #0d8f6b) !important; 
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 15px rgba(16, 163, 127, 0.4) !important;
+        background: linear-gradient(145deg, #10a37f, #0d8f6b) !important; 
+        border-color: #10a37f !important;
+        transform: translateY(-4px) scale(1.02) !important;
+        box-shadow: 0 12px 30px rgba(16, 163, 127, 0.5) !important;
     }
     
-    /* FORCE remove margins from button containers */
-    .stButton {
-        margin-bottom: 0rem !important;
+    /* BUTTON CONTAINER - More distinct */
+    .button-container {
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        padding: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        border-bottom: 3px solid #10a37f;
+        margin: 0;
     }
     
+    /* ENHANCED CONTENT AREA */
+    .content-section {
+        background: linear-gradient(135deg, #1a202c, #2d3748);
+        padding: 30px;
+        margin: 0;
+        box-shadow: inset 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* MORE DISTINCT FEATURE CARDS */
     .feature-card {
-        background: linear-gradient(135deg, #303030, #424242);
-        padding: 20px;
+        background: linear-gradient(145deg, #2d3748, #4a5568);
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 6px solid #10a37f;
+        margin: 20px 0;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        transition: transform 0.3s ease;
+        border: 1px solid #4a5568;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(16, 163, 127, 0.2);
+    }
+    
+    /* ENHANCED WELCOME SECTION */
+    .welcome-title {
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-align: center;
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .subtitle {
+        color: #a0aec0;
+        font-size: 1.2rem;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    
+    /* ENHANCED FEATURES LIST */
+    .feature-item {
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        padding: 15px;
+        margin: 10px 0;
         border-radius: 10px;
         border-left: 4px solid #10a37f;
-        margin: 15px 0;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
     }
     
+    .feature-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 18px rgba(16, 163, 127, 0.3);
+    }
+    
+    /* ENHANCED INPUT */
     .stTextInput input {
-        background: #424242 !important;
+        background: linear-gradient(135deg, #2d3748, #4a5568) !important;
         color: white !important;
-        border: 1px solid #555 !important;
-        border-radius: 8px !important;
-        padding: 10px !important;
+        border: 2px solid #4a5568 !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        font-size: 14px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
     }
     
+    .stTextInput input:focus {
+        border-color: #10a37f !important;
+        box-shadow: 0 0 20px rgba(16, 163, 127, 0.4) !important;
+    }
+    
+    /* ENHANCED METRICS */
     .stMetric {
-        background: linear-gradient(135deg, #303030, #424242) !important;
-        border: 1px solid #555 !important;
-        border-radius: 8px !important;
-        padding: 15px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
-        margin: 5px !important;
+        background: linear-gradient(145deg, #2d3748, #4a5568) !important;
+        border: 2px solid #4a5568 !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+        margin: 8px !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    .stMetric:hover {
+        transform: scale(1.05) !important;
+        border-color: #10a37f !important;
+    }
+    
+    /* SECTION HEADERS */
+    .section-header {
+        color: #10a37f;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 25px 0 15px 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        border-bottom: 2px solid #10a37f;
+        padding-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -162,10 +235,12 @@ def get_live_job_data():
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# Header
+# ENHANCED HEADER - More prominent
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# Navigation Buttons - Using standard Streamlit approach but with CSS overrides
+# ENHANCED BUTTON CONTAINER
+st.markdown('<div class="button-container">', unsafe_allow_html=True)
+
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -198,9 +273,13 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-# IMMEDIATE CONTENT - NO GAP
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ENHANCED CONTENT SECTION
+st.markdown('<div class="content-section">', unsafe_allow_html=True)
+
 if st.session_state.page == 'jobs':
-    st.markdown("## 📊 **Live Job Market Dashboard**")
+    st.markdown('<div class="section-header">📊 Live Job Market Dashboard</div>', unsafe_allow_html=True)
     
     with st.spinner("🌐 Fetching real-time data from APIs..."):
         job_data = get_live_job_data()
@@ -213,55 +292,63 @@ if st.session_state.page == 'jobs':
     with col3:
         st.metric("Last Updated", job_data['updated'], "Real-time")
     
-    st.markdown("### 🔥 **Trending Job Categories**")
-    st.write("• **Software Development**: 3,200+ active openings")
-    st.write("• **Data Science & Analytics**: 1,800+ positions available")
-    st.write("• **DevOps & Cloud Engineering**: 1,200+ roles")
-    st.write("• **AI/ML Engineering**: 900+ opportunities")
+    st.markdown('<div class="section-header">🔥 Trending Job Categories</div>', unsafe_allow_html=True)
+    
+    categories = [
+        "💻 **Software Development**: 3,200+ active openings",
+        "📊 **Data Science & Analytics**: 1,800+ positions available",
+        "☁️ **DevOps & Cloud Engineering**: 1,200+ roles",
+        "🤖 **AI/ML Engineering**: 900+ opportunities"
+    ]
+    
+    for category in categories:
+        st.markdown(f'<div class="feature-item">{category}</div>', unsafe_allow_html=True)
     
     if st.button("← Back to Home", key="back_jobs"):
         st.session_state.page = 'home'
         st.rerun()
 
 elif st.session_state.page == 'salary':
-    st.markdown("## 💰 **Live Salary & Market Dashboard**")
+    st.markdown('<div class="section-header">💰 Live Salary & Market Dashboard</div>', unsafe_allow_html=True)
     
     st.info("💹 Market-adjusted salary data based on current trends")
     
-    st.markdown("### 💼 **Current Salary Ranges**")
+    st.markdown('<div class="section-header">💼 Current Salary Ranges</div>', unsafe_allow_html=True)
     
     roles = [
-        "**Software Engineer**: ₹4-25 LPA ↗️",
-        "**Data Scientist**: ₹6-30 LPA ↗️",
-        "**DevOps Engineer**: ₹5-28 LPA ↗️", 
-        "**Product Manager**: ₹8-45 LPA ↗️",
-        "**AI/ML Engineer**: ₹7-35 LPA ↗️"
+        "💻 **Software Engineer**: ₹4-25 LPA ↗️",
+        "📊 **Data Scientist**: ₹6-30 LPA ↗️",
+        "☁️ **DevOps Engineer**: ₹5-28 LPA ↗️", 
+        "📱 **Product Manager**: ₹8-45 LPA ↗️",
+        "🤖 **AI/ML Engineer**: ₹7-35 LPA ↗️"
     ]
     
     for role in roles:
-        st.write(f"• {role}")
+        st.markdown(f'<div class="feature-item">{role}</div>', unsafe_allow_html=True)
     
     if st.button("← Back to Home", key="back_salary"):
         st.session_state.page = 'home'
         st.rerun()
 
 else:
-    # Home Page Content - STARTS IMMEDIATELY AFTER BUTTONS
-    st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
-    st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
+    # ENHANCED HOME PAGE
+    st.markdown('<div class="welcome-title">🎓 Welcome to DIET Career Buddy!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Your AI-Powered Career Assistant with Real-Time Data</div>', unsafe_allow_html=True)
     
     st.markdown("""
     <div class="feature-card">
-        <strong>🚀 What Makes Us Special:</strong><br>
-        • <strong>Real-Time APIs:</strong> Live job market data from GitHub & CoinGecko<br>
-        • <strong>DIET-Specific Guidance:</strong> Tailored advice for engineering students<br>
-        • <strong>Interactive Dashboards:</strong> 6 comprehensive career analysis tools<br>
-        • <strong>Zero-Gap Design:</strong> Professional, seamless interface<br>
-        • <strong>Market Intelligence:</strong> AI-powered career insights
+        <div style="font-size: 1.3rem; font-weight: bold; color: #10a37f; margin-bottom: 15px;">🚀 What Makes Us Special:</div>
+        <div style="line-height: 1.8;">
+            • <strong>Real-Time APIs:</strong> Live job market data from GitHub & CoinGecko<br>
+            • <strong>DIET-Specific Guidance:</strong> Tailored advice for engineering students<br>
+            • <strong>Interactive Dashboards:</strong> 6 comprehensive career analysis tools<br>
+            • <strong>Zero-Gap Design:</strong> Professional, seamless interface<br>
+            • <strong>Market Intelligence:</strong> AI-powered career insights
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 🎯 **Explore Our Features:**")
+    st.markdown('<div class="section-header">🎯 Explore Our Features:</div>', unsafe_allow_html=True)
     
     features = [
         "💻 **Tech Careers** - Latest technology trends and opportunities",
@@ -273,10 +360,11 @@ else:
     ]
     
     for feature in features:
-        st.write(feature)
+        st.markdown(f'<div class="feature-item">{feature}</div>', unsafe_allow_html=True)
     
-    # Interactive Chat
-    st.markdown("### 💬 **Ask Your Career Questions!**")
+    # Enhanced Chat Section
+    st.markdown('<div class="section-header">💬 Ask Your Career Questions!</div>', unsafe_allow_html=True)
+    
     user_input = st.text_input("💭 What would you like to know about your career?", 
                               placeholder="e.g., What skills do I need for data science?")
     
@@ -292,7 +380,9 @@ else:
         
         st.markdown(f"""
         <div class="feature-card">
-            <strong>You asked:</strong> {user_input}<br><br>
-            <strong>🎓 Assistant:</strong> {response}
+            <strong style="color: #10a37f;">You asked:</strong> {user_input}<br><br>
+            <strong style="color: #10a37f;">🎓 Assistant:</strong> {response}
         </div>
         """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
