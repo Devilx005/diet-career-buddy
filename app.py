@@ -165,10 +165,26 @@ if st.session_state.authenticated:
         padding: 0 20px; 
         z-index: 1000;
     ">
-        <div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>
-        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
-        <div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) window.location.reload()">
-            <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
+        <div style="width: 40px; display: flex; align-items: center;">
+            <span style="color: #a0aec0; cursor: pointer;">☰</span>
+        </div>
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
+            🎓 DIET Career Buddy
+        </div>
+        <div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" 
+             onclick="if(confirm('Sign out?')) window.location.reload()">
+            <span style="
+                background: #10a37f; 
+                color: white; 
+                border-radius: 50%; 
+                width: 28px; 
+                height: 28px; 
+                display: inline-flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 12px; 
+                margin-right: 8px;
+            ">{st.session_state.username[0].upper()}</span>
             {st.session_state.username}
         </div>
     </div>
@@ -189,7 +205,9 @@ else:
         z-index: 1000;
     ">
         <div style="width: 40px;"></div>
-        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
+            🎓 DIET Career Buddy
+        </div>
         <div style="width: 200px; text-align: right;">
             <button style="
                 background: #10a37f !important;
@@ -202,14 +220,18 @@ else:
                 font-size: 14px !important;
                 transition: all 0.3s ease !important;
                 box-shadow: 0 2px 8px rgba(16, 163, 127, 0.3) !important;
-            " onmouseover="this.style.background='#0d8f6b'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 163, 127, 0.4)'" 
-               onmouseout="this.style.background='#10a37f'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(16, 163, 127, 0.3)'"
-               onclick="alert('Login functionality disabled for testing')">Login</button>
+            " 
+            onmouseover="this.style.background='#0d8f6b'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 163, 127, 0.4)'" 
+            onmouseout="this.style.background='#10a37f'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(16, 163, 127, 0.3)'"
+            onclick="alert('Login functionality disabled for testing')">
+                Login
+            </button>
         </div>
     </div>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
+
 
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
