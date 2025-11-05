@@ -50,6 +50,11 @@ def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
+# LOGIN TRIGGER METHOD
+def handle_login_trigger():
+    """Method to handle login button click and show login modal"""
+    st.session_state.show_login_modal = True
+
 # Login Modal Function
 def show_login_modal():
     st.markdown("""
@@ -213,143 +218,101 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# COMPLETELY ISOLATED HIDDEN LOGIN TRIGGER
+# HIDDEN LOGIN TRIGGER - PLACED RIGHT NEAR LOGIN BUTTON SECTION
 if not st.session_state.authenticated:
-    # Create a completely separate container for the hidden trigger
-    st.markdown('<div id="hidden-login-container" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; visibility: hidden; pointer-events: none; z-index: -9999;"></div>', unsafe_allow_html=True)
     
-    # Use expander to further isolate the button
-    with st.expander("🔐", expanded=False):
-        login_clicked = st.button("HIDDEN_LOGIN_TRIGGER_XYZ123", key="completely_isolated_login_btn_xyz789", help="Completely isolated login trigger")
-        
-        if login_clicked:
-            st.session_state.show_login_modal = True
-            st.rerun()
+    # Hidden login trigger positioned near the top of the page
+    st.markdown("""
+    <div style="position: absolute; top: -1000px; left: -1000px; width: 1px; height: 1px; opacity: 0; visibility: hidden;">
+    """, unsafe_allow_html=True)
     
-    # JavaScript to connect header button to isolated hidden button
+    # The actual hidden trigger button with method
+    if st.button("🔐 LOGIN_TRIGGER", key="hidden_login_trigger_btn", on_click=handle_login_trigger, help="Hidden login trigger button"):
+        # This will never be reached since on_click handles it
+        pass
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # JavaScript to connect header login button to hidden trigger
     st.markdown("""
     <script>
-    // Wait longer for page to fully load
+    // Function to trigger login
+    function triggerLogin() {
+        console.log('Triggering login...');
+        
+        // Find the hidden login trigger button
+        const buttons = parent.document.querySelectorAll('button');
+        let hiddenBtn = null;
+        
+        buttons.forEach(btn => {
+            if (btn.textContent && btn.textContent.includes('LOGIN_TRIGGER')) {
+                hiddenBtn = btn;
+            }
+        });
+        
+        if (hiddenBtn) {
+            console.log('Found hidden button, clicking...');
+            hiddenBtn.click();
+        } else {
+            console.log('Hidden button not found');
+        }
+    }
+    
+    // Wait for page load and connect the header button
     setTimeout(function() {
         const headerBtn = document.getElementById('headerLoginBtn');
         if (headerBtn) {
-            // Completely replace the button to remove all event listeners
-            const newBtn = headerBtn.cloneNode(true);
-            headerBtn.parentNode.replaceChild(newBtn, headerBtn);
+            console.log('Header login button found, adding event listener...');
             
-            newBtn.addEventListener('click', function(event) {
-                // Completely prevent any default behavior
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                event.stopPropagation();
-                
-                // Find the isolated hidden button
-                const allButtons = parent.document.querySelectorAll('button');
-                let targetBtn = null;
-                
-                allButtons.forEach(btn => {
-                    if (btn.textContent && (
-                        btn.textContent.includes('HIDDEN_LOGIN_TRIGGER_XYZ123') ||
-                        btn.getAttribute('data-testid') === 'completely_isolated_login_btn_xyz789'
-                    )) {
-                        targetBtn = btn;
-                    }
-                });
-                
-                if (targetBtn) {
-                    // Trigger click on isolated button
-                    targetBtn.click();
-                } else {
-                    console.log('Hidden login trigger not found');
-                }
-                
+            // Remove any existing listeners and add new one
+            headerBtn.replaceWith(headerBtn.cloneNode(true));
+            const newHeaderBtn = document.getElementById('headerLoginBtn');
+            
+            newHeaderBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Header login button clicked');
+                triggerLogin();
                 return false;
             });
+        } else {
+            console.log('Header login button not found');
         }
-    }, 2000);
+    }, 1500);
     </script>
     
     <style>
-    /* Completely hide all traces of the hidden login trigger */
-    
-    /* Hide by content */
-    button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123"),
-    button[title*="isolated"],
-    button[data-testid="completely_isolated_login_btn_xyz789"] {
+    /* Hide the login trigger button completely */
+    button:contains("LOGIN_TRIGGER"),
+    button[title="Hidden login trigger button"] {
         display: none !important;
         position: absolute !important;
-        left: -99999px !important;
-        top: -99999px !important;
+        left: -9999px !important;
+        top: -9999px !important;
         width: 0 !important;
         height: 0 !important;
         opacity: 0 !important;
         visibility: hidden !important;
         pointer-events: none !important;
-        z-index: -99999 !important;
-        overflow: hidden !important;
+        z-index: -9999 !important;
     }
     
-    /* Hide the expander containing the hidden button */
-    details:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")) {
+    /* Hide container of hidden button */
+    .element-container:has(button:contains("LOGIN_TRIGGER")) {
         display: none !important;
         position: absolute !important;
-        left: -99999px !important;
-        top: -99999px !important;
-        width: 0 !important;
-        height: 0 !important;
+        left: -9999px !important;
+        top: -9999px !important;
         opacity: 0 !important;
         visibility: hidden !important;
-        pointer-events: none !important;
-        z-index: -99999 !important;
-        overflow: hidden !important;
     }
     
-    /* Hide any container with the hidden button */
-    .element-container:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")),
-    .streamlit-expanderHeader:contains("🔐"),
-    .streamlit-expander:has(button:contains("HIDDEN_LOGIN_TRIGGER_XYZ123")) {
-        display: none !important;
-        position: absolute !important;
-        left: -99999px !important;
-        top: -99999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-        z-index: -99999 !important;
-        overflow: hidden !important;
-    }
-    
-    /* Ensure main login button stays visible */
+    /* Ensure header login button is always visible */
     #headerLoginBtn {
         display: inline-block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        position: static !important;
-        pointer-events: auto !important;
         z-index: 1000 !important;
-    }
-    
-    /* Hide expander with 🔐 icon */
-    div[data-testid="stExpander"]:has(summary:contains("🔐")),
-    details:has(summary:contains("🔐")) {
-        display: none !important;
-        position: absolute !important;
-        left: -99999px !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-    }
-    
-    /* Additional nuclear option - hide anything with isolated keywords */
-    *[class*="isolated"],
-    *[id*="isolated"],
-    *[data-testid*="isolated"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -406,7 +369,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons - FIXED TO EXCLUDE LOGIN BUTTON
+    # Navigation Buttons
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
