@@ -4,27 +4,25 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# PRECISE CSS - Fix overlapping and gaps
+# PERFECT CSS - No left gap, proper button spacing, clean content
 st.markdown("""
 <style>
-    /* AGGRESSIVE removal of ALL Streamlit spacing */
+    /* COMPLETE removal of ALL Streamlit containers */
     .main .block-container { 
-        padding-top: 0rem !important; 
-        padding-left: 0rem !important; 
-        padding-right: 0rem !important; 
-        padding-bottom: 0rem !important;
-        margin-top: 0rem !important;
-        margin-left: 0rem !important;
-        margin-right: 0rem !important;
+        padding: 0rem !important; 
+        margin: 0rem !important;
         max-width: 100% !important;
-        width: 100% !important;
+        width: 100vw !important;
+        position: relative;
+        left: 0;
+        right: 0;
     }
     .stApp > header { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     .stDeployButton { display: none !important; }
     section[data-testid="stSidebar"] { display: none !important; }
     
-    /* FORCE full width, no margins */
+    /* FORCE full width from absolute edge */
     body { 
         background: #212121 !important; 
         color: white !important; 
@@ -35,14 +33,14 @@ st.markdown("""
     }
     .stApp { 
         background: #212121 !important; 
-        margin-top: -100px !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+        margin: 0 !important;
         padding: 0 !important;
         width: 100vw !important;
+        position: relative;
+        left: 0;
     }
     
-    /* Remove ALL gaps between elements */
+    /* Remove ALL Streamlit gaps */
     div[data-testid="stVerticalBlock"] { 
         gap: 0rem !important; 
         margin: 0rem !important;
@@ -61,24 +59,26 @@ st.markdown("""
         width: 100% !important;
     }
     
-    /* FIX BUTTON OVERLAPPING - Proper spacing */
+    /* BUTTON GRID - Proper spacing, no overlap */
     .stColumns { 
-        gap: 6px !important; 
+        gap: 8px !important; 
         margin: 0rem !important; 
-        padding: 0rem !important;
+        padding: 0rem 15px !important;
         width: 100% !important;
+        display: flex !important;
     }
     .stColumn { 
         padding: 0rem !important; 
         margin: 0rem !important; 
+        flex: 1 1 0 !important;
         min-width: 0 !important;
-        flex: 1 !important;
+        max-width: none !important;
     }
     
-    /* HEADER - Full width, no gaps */
+    /* HEADER - Full width */
     .header { 
         background: linear-gradient(135deg, #303030, #424242); 
-        padding: 18px 20px; 
+        padding: 18px 0; 
         text-align: center; 
         font-weight: bold; 
         border-bottom: 3px solid #10a37f; 
@@ -86,38 +86,23 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         margin: 0;
         width: 100vw;
-        position: relative;
-        left: 0;
-        right: 0;
     }
     
-    /* BUTTON CONTAINER - Full width */
-    .button-section {
-        background: linear-gradient(135deg, #2d3748, #4a5568);
-        padding: 10px 15px;
-        margin: 0;
-        width: 100vw;
-        position: relative;
-        left: 0;
-        right: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    
-    /* BUTTONS - Fixed spacing, no overlap */
+    /* BUTTONS - Perfect sizing */
     .stButton > button { 
         background: linear-gradient(135deg, #424242, #525252) !important; 
         color: white !important; 
         border: 1px solid #555 !important; 
         width: 100% !important;
-        height: 70px !important;
+        height: 65px !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
-        font-size: 10px !important;
+        font-size: 11px !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
         margin: 0 !important;
-        padding: 4px !important;
-        line-height: 1.2 !important;
+        padding: 5px !important;
+        line-height: 1.1 !important;
     }
     
     .stButton > button:hover { 
@@ -126,15 +111,12 @@ st.markdown("""
         box-shadow: 0 6px 18px rgba(16, 163, 127, 0.4) !important;
     }
     
-    /* CONTENT - Full width, no gaps */
-    .content { 
+    /* CONTENT - Full width, no left gap */
+    .main-content { 
         padding: 25px 20px; 
         background: #212121;
         margin: 0 !important;
         width: 100vw;
-        position: relative;
-        left: 0;
-        right: 0;
     }
     
     .feature-card {
@@ -164,13 +146,12 @@ st.markdown("""
         margin: 4px !important;
     }
     
-    /* Mobile responsive - prevent overlap */
+    /* Mobile responsive */
     @media (max-width: 768px) {
-        .stColumns { gap: 3px !important; }
+        .stColumns { gap: 4px !important; padding: 0rem 10px !important; }
         .stButton > button { 
             font-size: 9px !important; 
-            height: 60px !important; 
-            padding: 2px !important;
+            height: 55px !important; 
         }
     }
 </style>
@@ -200,12 +181,10 @@ def get_live_job_data():
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# HEADER - Edge to edge
+# HEADER
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# BUTTON SECTION - Edge to edge with proper spacing
-st.markdown('<div class="button-section">', unsafe_allow_html=True)
-
+# BUTTONS - Properly spaced
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -238,10 +217,8 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
-
-# CONTENT - Edge to edge, no gaps
-st.markdown('<div class="content">', unsafe_allow_html=True)
+# MAIN CONTENT
+st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
 if st.session_state.page == 'jobs':
     st.markdown("## 📊 **Live Job Market Dashboard**")
@@ -295,7 +272,7 @@ elif st.session_state.page == 'salary':
         st.rerun()
 
 else:
-    # Home Page
+    # CLEAN HOME PAGE - No duplicate sections
     st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
     
@@ -310,21 +287,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 🎯 **Explore Our Features:**")
-    
-    features = [
-        "💻 **Tech Careers** - Latest technology trends and opportunities",
-        "💰 **Live Salary** - Real-time market-adjusted salary data", 
-        "📚 **Learning Paths** - Curated skill development roadmaps",
-        "🎓 **DIET Guide** - College-specific placement strategies",
-        "🎯 **Interview Prep** - Technical and behavioral preparation",
-        "📊 **Live Jobs** - Real-time job market analysis with APIs"
-    ]
-    
-    for feature in features:
-        st.write(feature)
-    
-    # Interactive Chat
+    # Interactive Chat ONLY - Remove duplicate features
     st.markdown("### 💬 **Ask Your Career Questions!**")
     user_input = st.text_input("💭 What would you like to know about your career?", 
                               placeholder="e.g., What skills do I need for data science?")
@@ -336,8 +299,12 @@ else:
             response += "💰 Check the **Live Salary** dashboard for real-time data!"
         elif any(word in user_input.lower() for word in ['job', 'hiring', 'market']):
             response += "📊 Visit the **Live Jobs** dashboard for market insights!"
+        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course']):
+            response += "📚 Explore the **Learning Paths** dashboard for skill development!"
+        elif any(word in user_input.lower() for word in ['interview', 'preparation']):
+            response += "🎯 Check the **Interview Prep** dashboard for preparation tips!"
         else:
-            response += "🎓 Click the dashboard buttons above for detailed insights!"
+            response += "🎓 Click any dashboard button above for detailed insights!"
         
         st.markdown(f"""
         <div class="feature-card">
