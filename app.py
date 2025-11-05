@@ -145,18 +145,7 @@ if not st.session_state.logged_in:
         st.session_state.show_login_form = True
         st.rerun()
     
-    st.markdown("""
-    <style>
-    button[title="working_login_trigger"] {
-        position: fixed !important;
-        top: 0px !important;
-        right: 0px !important;
-        z-index: 1 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
+  
 # Show optional login form when triggered
 if st.session_state.show_login_form:
     show_login_form()
