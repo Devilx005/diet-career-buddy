@@ -202,14 +202,6 @@ def show_login_modal():
         email = st.text_input("Email", placeholder="Enter your email address", key="login_email")
         password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
-        # Remember me and forgot password
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            remember_me = st.checkbox("Remember me", key="remember")
-        with col2:
-            if st.button("Forgot password?", key="forgot_pass"):
-                st.info("🔄 Password reset link sent to your email!")
-        
         # Login button
         if st.button("🚀 Login", key="login_submit", use_container_width=True, type="primary"):
             if not email or not password:
@@ -230,7 +222,7 @@ def show_login_modal():
         # Sign up link
         st.markdown("""
         <div class="signup-link">
-            Don't have an account? <a onclick="changeToSignup()">Sign up</a>
+            Don't have an account? <a href="#" onclick="document.getElementById('signup_tab').click()">Sign up</a>
         </div>
         """, unsafe_allow_html=True)
     
@@ -270,7 +262,7 @@ def show_login_modal():
         # Sign in link
         st.markdown("""
         <div class="signup-link">
-            Already have an account? <a onclick="changeToLogin()">Sign in</a>
+            Already have an account? <a href="#" onclick="document.getElementById('login_tab').click()">Sign in</a>
         </div>
         """, unsafe_allow_html=True)
     
@@ -280,28 +272,14 @@ def show_login_modal():
         st.session_state.show_login_modal = False
         st.rerun()
     
-    # JavaScript for link clicks
-    st.markdown("""
-    <script>
-    function changeToSignup() {
-        const signupBtn = parent.document.querySelector('button[data-testid="baseButton-secondary"][key="signup_tab"]');
-        if (signupBtn) signupBtn.click();
-    }
-    function changeToLogin() {
-        const loginBtn = parent.document.querySelector('button[data-testid="baseButton-primary"][key="login_tab"]');
-        if (loginBtn) loginBtn.click();
-    }
-    </script>
-    """, unsafe_allow_html=True)
-    
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# HEADER with FUNCTIONAL Login Button
+# HEADER with clean Login/Logout functionality
 if st.session_state.authenticated:
     left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" title="Click to logout">
+    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) {{ window.location.href=window.location.href+'?logout=1' }}">
         <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
         {st.session_state.username}
     </div>'''
@@ -309,7 +287,7 @@ else:
     left_section = '<div style="width: 40px;"></div>'
     title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
     user_display = '''<div style="width: 200px; text-align: right;">
-        <button id="login-btn-header" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
+        <button onclick="window.location.href=window.location.href+'?login=1'" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Login</button>
     </div>'''
 
 st.markdown(f"""
@@ -335,79 +313,17 @@ st.markdown(f"""
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# ✅ HIDDEN TRIGGER BUTTON (this makes the Login button work)
-if st.button("Trigger Login", key="login_trigger", help="Hidden trigger"):
+# Handle URL parameters for login/logout (NO EXTRA BUTTONS!)
+if st.query_params.get("login") == "1":
     st.session_state.show_login_modal = True
+
+if st.query_params.get("logout") == "1":
+    st.session_state.authenticated = False
+    st.session_state.username = ""
+    st.session_state.page = 'home'
+    st.session_state.show_login_modal = False
+    st.query_params.clear()
     st.rerun()
-
-# ✅ HIDDEN LOGOUT BUTTON (for user menu)
-if st.button("Trigger Logout", key="logout_trigger", help="Hidden logout"):
-    if st.session_state.authenticated:
-        st.session_state.authenticated = False
-        st.session_state.username = ""
-        st.session_state.page = 'home'
-        st.session_state.show_login_modal = False
-        st.rerun()
-
-# ✅ JAVASCRIPT TO MAKE LOGIN BUTTON WORK
-st.markdown("""
-<script>
-// Wait for page to load
-setTimeout(function() {
-    // Find the Login button in header
-    const loginBtn = parent.document.getElementById('login-btn-header');
-    
-    // Find the hidden trigger button
-    const triggerBtns = parent.document.querySelectorAll('button');
-    let triggerBtn = null;
-    
-    triggerBtns.forEach(btn => {
-        if (btn.title === 'Hidden trigger') {
-            triggerBtn = btn;
-        }
-    });
-    
-    // Connect header Login button to trigger
-    if (loginBtn && triggerBtn) {
-        loginBtn.onclick = function() {
-            triggerBtn.click();
-        };
-    }
-    
-    // Handle user menu logout
-    const userDiv = parent.document.querySelector('div[title="Click to logout"]');
-    if (userDiv) {
-        let logoutBtn = null;
-        triggerBtns.forEach(btn => {
-            if (btn.title === 'Hidden logout') {
-                logoutBtn = btn;
-            }
-        });
-        
-        if (logoutBtn) {
-            userDiv.onclick = function() {
-                if (confirm('Sign out?')) {
-                    logoutBtn.click();
-                }
-            };
-        }
-    }
-}, 1000);
-</script>
-""", unsafe_allow_html=True)
-
-# CSS to hide the trigger buttons
-st.markdown("""
-<style>
-    button[title="Hidden trigger"], 
-    button[title="Hidden logout"] {
-        display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        left: -9999px !important;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # Show login modal when triggered
 if st.session_state.show_login_modal and not st.session_state.authenticated:
