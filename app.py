@@ -149,89 +149,110 @@ def show_login_modal():
     - 👨‍💼 admin@diet.com / admin123
     """)
 
-# HEADER with THE ONLY LOGIN BUTTON
+# HEADER with CORRECTLY POSITIONED LOGIN BUTTON
 if st.session_state.authenticated:
-    left_section = '<div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>'
-    title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = f'''<div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) window.location.reload()">
-        <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
-        {st.session_state.username}
-    </div>'''
+    header_html = f'''
+    <div style="
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        height: 55px; 
+        background: #212121; 
+        border-bottom: 1px solid #444; 
+        display: flex; 
+        align-items: center; 
+        padding: 0 20px; 
+        z-index: 1000;
+    ">
+        <div style="width: 40px; display: flex; align-items: center;"><span style="color: #a0aec0; cursor: pointer;">☰</span></div>
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
+        <div style="color: #a0aec0; font-size: 14px; width: 200px; text-align: right; cursor: pointer;" onclick="if(confirm('Sign out?')) window.location.reload()">
+            <span style="background: #10a37f; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;">{st.session_state.username[0].upper()}</span>
+            {st.session_state.username}
+        </div>
+    </div>
+    '''
 else:
-    left_section = '<div style="width: 40px;"></div>'
-    title_section = f'<div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>'
-    user_display = '<div style="width: 200px; text-align: right;" id="login-button-container"></div>'
+    header_html = f'''
+    <div style="
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        height: 55px; 
+        background: #212121; 
+        border-bottom: 1px solid #444; 
+        display: flex; 
+        align-items: center; 
+        padding: 0 20px; 
+        z-index: 1000;
+    ">
+        <div style="width: 40px;"></div>
+        <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">🎓 DIET Career Buddy</div>
+        <div style="width: 200px; text-align: right;">
+            <button onclick="openLoginModal()" style="background: #10a37f; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Login</button>
+        </div>
+    </div>
+    '''
 
-st.markdown(f"""
-<div style="
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    height: 55px; 
-    background: #212121; 
-    border-bottom: 1px solid #444; 
-    display: flex; 
-    align-items: center; 
-    padding: 0 20px; 
-    z-index: 1000;
-">
-    {left_section}
-    {title_section}
-    {user_display}
-</div>
-""", unsafe_allow_html=True)
+st.markdown(header_html, unsafe_allow_html=True)
 
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# THE ONLY LOGIN BUTTON (when not authenticated)
+# HIDDEN LOGIN TRIGGER (completely invisible but functional)
 if not st.session_state.authenticated:
-    # Create the login button
-    if st.button("Login", key="main_login_button", help="Click to login"):
+    # Create hidden but functional Streamlit button
+    login_clicked = st.button("🔓 Hidden Login Trigger", key="login_trigger_hidden", help="Hidden")
+    
+    if login_clicked:
         st.session_state.show_login_modal = True
         st.rerun()
     
-    # Move this button to header using JavaScript
+    # JavaScript and CSS to connect header button and hide trigger
     st.markdown("""
     <script>
-    setTimeout(function() {
-        // Find the login button
+    function openLoginModal() {
+        // Find and click the hidden Streamlit button
         const buttons = parent.document.querySelectorAll('button');
-        let loginBtn = null;
-        
         buttons.forEach(btn => {
-            if (btn.title === 'Click to login' || btn.textContent.trim() === 'Login') {
-                loginBtn = btn;
+            if (btn.title === 'Hidden' || btn.textContent.includes('Hidden Login Trigger')) {
+                btn.click();
             }
         });
-        
-        // Find the header container
-        const container = parent.document.getElementById('login-button-container');
-        
-        if (loginBtn && container) {
-            // Style the button like header button
-            loginBtn.style.cssText = `
-                background: #10a37f !important;
-                color: white !important;
-                border: none !important;
-                padding: 10px 18px !important;
-                border-radius: 8px !important;
-                font-weight: 600 !important;
-                cursor: pointer !important;
-                font-size: 14px !important;
-                transition: all 0.3s ease !important;
-                position: fixed !important;
-                top: 12px !important;
-                right: 20px !important;
-                z-index: 1001 !important;
-            `;
-            
-            // Hide original button container
-            loginBtn.parentElement.style.display = 'none';
-        }
-    }, 500);
+    }
+    
+    // Hide the trigger button completely
+    setTimeout(function() {
+        const buttons = parent.document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            if (btn.title === 'Hidden' || btn.textContent.includes('Hidden Login Trigger')) {
+                // Hide button and its container
+                btn.style.cssText = 'display: none !important; position: absolute !important; left: -9999px !important; visibility: hidden !important; width: 0 !important; height: 0 !important;';
+                if (btn.parentElement) {
+                    btn.parentElement.style.cssText = 'display: none !important; position: absolute !important; left: -9999px !important; visibility: hidden !important; width: 0 !important; height: 0 !important;';
+                }
+            }
+        });
+    }, 100);
     </script>
+    
+    <style>
+    /* Multiple approaches to hide the trigger button */
+    button[title="Hidden"], 
+    button:contains("🔓 Hidden Login Trigger"),
+    .element-container:has(button[title="Hidden"]) {
+        display: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        z-index: -9999 !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
 # Handle logout via URL parameter
