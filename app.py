@@ -4,7 +4,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="🎓 DIET Career Buddy", layout="wide", initial_sidebar_state="collapsed")
 
-# SIMPLE SAFE CSS - Just the essentials
+# GENTLE LIFT CSS - Move up without breaking
 st.markdown("""
 <style>
     .main .block-container { 
@@ -18,8 +18,21 @@ st.markdown("""
     .stDeployButton { display: none !important; }
     section[data-testid="stSidebar"] { display: none !important; }
     
-    body { background: #212121 !important; color: white !important; }
-    .stApp { background: #212121 !important; }
+    body { 
+        background: #212121 !important; 
+        color: white !important; 
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .stApp { 
+        background: #212121 !important; 
+        margin-top: -60px !important; /* GENTLE lift up */
+    }
+    
+    /* Remove some gaps between elements */
+    div[data-testid="stVerticalBlock"] { 
+        gap: 0.5rem !important; 
+    }
     
     .header { 
         background: linear-gradient(135deg, #303030, #424242); 
@@ -29,6 +42,12 @@ st.markdown("""
         border-bottom: 3px solid #10a37f; 
         font-size: 18px;
         margin: 0 -1rem 1rem -1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* Better button spacing */
+    .stColumns { 
+        gap: 0.5rem !important; 
     }
     
     .stButton > button { 
@@ -42,11 +61,13 @@ st.markdown("""
         font-size: 10px !important;
         transition: all 0.3s ease !important;
         margin: 2px !important;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
     }
     
     .stButton > button:hover { 
         background: linear-gradient(135deg, #10a37f, #0d8f6b) !important; 
         transform: translateY(-1px) !important;
+        box-shadow: 0 5px 15px rgba(16, 163, 127, 0.4) !important;
     }
     
     .feature-card {
@@ -73,6 +94,17 @@ st.markdown("""
         padding: 12px !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
         margin: 4px !important;
+    }
+    
+    /* Improve content spacing */
+    .main-title {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .subtitle {
+        margin-top: 0rem !important;
+        margin-bottom: 1rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -104,7 +136,7 @@ if 'page' not in st.session_state:
 # Header
 st.markdown('<div class="header">🎓 DIET Career Buddy - Enhanced Edition</div>', unsafe_allow_html=True)
 
-# Navigation Buttons - Simple grid
+# Navigation Buttons with proper spacing
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
@@ -137,7 +169,7 @@ with col6:
         st.session_state.page = 'jobs'
         st.rerun()
 
-# Content
+# Content with better spacing
 if st.session_state.page == 'jobs':
     st.markdown("## 📊 **Live Job Market Dashboard**")
     
@@ -185,9 +217,14 @@ elif st.session_state.page == 'salary':
         st.rerun()
 
 else:
-    # Simple Home Page
+    # Home Page with optimized spacing
+    st.markdown('<div class="main-title">', unsafe_allow_html=True)
     st.markdown("## 🎓 **Welcome to DIET Career Buddy!**")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="subtitle">', unsafe_allow_html=True)
     st.markdown("### *Your AI-Powered Career Assistant with Real-Time Data*")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("""
     <div class="feature-card">
@@ -212,6 +249,10 @@ else:
             response += "💰 Check the **Live Salary** dashboard for real-time data!"
         elif any(word in user_input.lower() for word in ['job', 'hiring', 'market']):
             response += "📊 Visit the **Live Jobs** dashboard for market insights!"
+        elif any(word in user_input.lower() for word in ['learn', 'skill', 'course']):
+            response += "📚 Explore the **Learning Paths** dashboard for skill development!"
+        elif any(word in user_input.lower() for word in ['interview', 'preparation']):
+            response += "🎯 Check the **Interview Prep** dashboard for preparation tips!"
         else:
             response += "🎓 Click any dashboard button above for detailed insights!"
         
