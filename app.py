@@ -213,39 +213,51 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# Hidden functional button for login
+# Hidden functional button for login - FIXED VERSION
 if not st.session_state.authenticated:
     # This invisible button provides the actual Streamlit functionality
-    login_clicked = st.button("🔐", key="hidden_login_trigger", help="Hidden login trigger")
+    # Use a unique key that won't conflict with navigation buttons
+    col_hidden1, col_hidden2, col_hidden3 = st.columns([1,1,1])
+    with col_hidden2:  # Put in middle column to avoid conflicts
+        login_clicked = st.button("🔐", key="unique_hidden_login_trigger_btn", help="Hidden login trigger")
+        
+        if login_clicked:
+            st.session_state.show_login_modal = True
+            st.rerun()
     
-    if login_clicked:
-        st.session_state.show_login_modal = True
-        st.rerun()
-    
-    # JavaScript to connect header button to hidden button
+    # JavaScript to connect header button to hidden button - IMPROVED
     st.markdown("""
     <script>
     // Wait for page to load, then connect the header button
     setTimeout(function() {
         const headerBtn = document.getElementById('headerLoginBtn');
         if (headerBtn) {
-            headerBtn.addEventListener('click', function() {
+            // Remove any existing event listeners
+            headerBtn.replaceWith(headerBtn.cloneNode(true));
+            const newHeaderBtn = document.getElementById('headerLoginBtn');
+            
+            newHeaderBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 // Find and click the hidden Streamlit button
                 const buttons = parent.document.querySelectorAll('button');
                 buttons.forEach(btn => {
                     if (btn.title === 'Hidden login trigger' || btn.textContent.includes('🔐')) {
                         btn.click();
+                        return;
                     }
                 });
             });
         }
-    }, 1000);
+    }, 1500);
     </script>
     
     <style>
     /* Hide the trigger button completely */
     button[title="Hidden login trigger"],
-    button:contains("🔐") {
+    button:contains("🔐"),
+    button[data-testid*="button"]:contains("🔐") {
         display: none !important;
         position: absolute !important;
         left: -9999px !important;
@@ -256,11 +268,22 @@ if not st.session_state.authenticated:
     }
     
     /* Also hide its container */
-    .element-container:has(button[title="Hidden login trigger"]) {
+    .element-container:has(button[title="Hidden login trigger"]),
+    .element-container:has(button:contains("🔐")) {
         display: none !important;
         position: absolute !important;
         left: -9999px !important;
         visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure header login button stays visible and clickable */
+    #headerLoginBtn {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: static !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -317,7 +340,7 @@ else:
     if not st.session_state.authenticated:
         st.info("💡 **Sign in to unlock personalized dashboards and save your progress!**")
     
-    # Navigation Buttons
+    # Navigation Buttons - FIXED TO EXCLUDE LOGIN BUTTON
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
