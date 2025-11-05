@@ -139,19 +139,17 @@ st.markdown(header_html, unsafe_allow_html=True)
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
 
-# ORIGINAL STREAMLIT LOGIN TRIGGER - POSITIONED IN HEADER WITH BETTER CSS
+# ORIGINAL STREAMLIT LOGIN TRIGGER - POSITIONED IN HEADER WITH CSS
 if not st.session_state.logged_in:
     if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
         st.session_state.show_login_form = True
         st.rerun()
     
-    # STRONGER CSS TO MOVE ORIGINAL BUTTON TO HEADER RIGHT CORNER
+    # CSS TO MOVE ORIGINAL BUTTON TO HEADER RIGHT CORNER
     st.markdown("""
     <style>
-    /* Target button by its text content - more reliable */
-    button:contains("🔐 Login Trigger"),
-    button[aria-label*="Login Trigger"],
-    div[data-testid="column"] button:has-text("🔐 Login Trigger") {
+    /* Move the original Streamlit button to header */
+    button[key="working_login_trigger"] {
         position: fixed !important;
         top: 10px !important;
         right: 20px !important;
@@ -165,34 +163,14 @@ if not st.session_state.logged_in:
         font-size: 13px !important;
     }
     
-    /* Target all buttons that contain the login trigger text */
-    .stButton > button:nth-child(1) {
-        position: fixed !important;
-        top: 10px !important;
-        right: 20px !important;
-        z-index: 1001 !important;
-        background: rgba(16, 163, 127, 0.8) !important;
-        color: white !important;
-        border: none !important;
-        padding: 6px 12px !important;
-        border-radius: 6px !important;
-        font-weight: 600 !important;
-        font-size: 13px !important;
-    }
-    
-    /* Hide the container that holds the button in its original position */
-    .element-container:has(button:contains("🔐 Login Trigger")) {
+    /* Also move its container */
+    .element-container:has(button[key="working_login_trigger"]) {
         position: fixed !important;
         top: 0 !important;
         right: 0 !important;
         z-index: 1001 !important;
         width: auto !important;
         height: auto !important;
-        pointer-events: none !important;
-    }
-    
-    .element-container:has(button:contains("🔐 Login Trigger")) button {
-        pointer-events: auto !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -242,7 +220,7 @@ elif st.session_state.page == 'interview':
 
 elif st.session_state.page == 'jobs':
     jobs_dashboard.show()
-    if st.button("�7🧠 Back to Home", key="back_jobs"):
+    if st.button("🏠 Back to Home", key="back_jobs"):
         st.session_state.page = 'home'
         st.rerun()
 
