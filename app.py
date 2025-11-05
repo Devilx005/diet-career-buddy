@@ -130,39 +130,11 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# WORKING LOGIN TRIGGER - POSITIONED IN RIGHT CORNER OF TITLE BAR USING CSS
+# WORKING LOGIN TRIGGER - ALWAYS VISIBLE (NOT HIDDEN)
 if not st.session_state.logged_in:
     if st.button("🔐 Login Trigger", key="working_login_trigger", help="working_login_trigger"):
         st.session_state.show_login_form = True
         st.rerun()
-    
-    # Position the login trigger in the right corner of title bar using CSS
-    st.markdown("""
-    <style>
-    button[title="working_login_trigger"] {
-        position: fixed !important;
-        top: 10px !important;
-        right: 20px !important;
-        z-index: 1001 !important;
-        background: rgba(16, 163, 127, 0.8) !important;
-        color: white !important;
-        border: none !important;
-        padding: 6px 12px !important;
-        border-radius: 6px !important;
-        font-weight: 600 !important;
-        font-size: 13px !important;
-    }
-    
-    .element-container:has(button[title="working_login_trigger"]) {
-        position: fixed !important;
-        top: 0 !important;
-        right: 0 !important;
-        z-index: 1001 !important;
-        width: auto !important;
-        height: auto !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 # Show optional login form when triggered
 if st.session_state.show_login_form:
