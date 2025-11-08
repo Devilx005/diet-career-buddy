@@ -52,6 +52,7 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
+            <div id="logout-container"></div>
         </div>
     </div>
     '''
@@ -77,7 +78,7 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="text-align: right;">
-            <!-- Login button will be positioned here with CSS -->
+            <div id="login-container"></div>
         </div>
     </div>
     '''
@@ -87,20 +88,25 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# LOGIN BUTTON IN HEADER (positioned with CSS)
+# LOGIN/LOGOUT BUTTON - Better CSS approach
 if not st.session_state.logged_in:
     if st.button("🔐 Login", key="header_login_btn"):
         st.session_state.show_login = True
         st.rerun()
     
-    # Position login button in header
+    # Move button to header with improved CSS
     st.markdown("""
     <style>
-    button[kind="secondary"][key="header_login_btn"] {
+    /* Hide the original container */
+    .stButton {
         position: fixed !important;
         top: 10px !important;
         right: 20px !important;
         z-index: 1001 !important;
+    }
+    
+    /* Style the button itself */
+    .stButton > button {
         background: rgba(16, 163, 127, 0.8) !important;
         color: white !important;
         border: none !important;
@@ -108,25 +114,33 @@ if not st.session_state.logged_in:
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        background: #10a37f !important;
+        transform: scale(1.05) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# LOGOUT BUTTON (if logged in)
 if st.session_state.logged_in:
     if st.button("Logout", key="header_logout_btn"):
         st.session_state.logged_in = False
         st.session_state.username = ""
         st.rerun()
     
-    # Position logout button in header
+    # Move logout button to header
     st.markdown("""
     <style>
-    button[kind="secondary"][key="header_logout_btn"] {
+    .stButton {
         position: fixed !important;
         top: 10px !important;
         right: 20px !important;
         z-index: 1001 !important;
+    }
+    
+    .stButton > button {
         background: transparent !important;
         color: #ff6b6b !important;
         border: 1px solid #ff6b6b !important;
@@ -135,10 +149,15 @@ if st.session_state.logged_in:
         font-weight: 600 !important;
         font-size: 14px !important;
     }
+    
+    .stButton > button:hover {
+        background: #ff6b6b !important;
+        color: white !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# LOGIN FORM (seamless, no URL change)
+# LOGIN FORM
 if st.session_state.show_login and not st.session_state.logged_in:
     st.markdown("### 🔐 Login to DIET Career Buddy")
     st.info("💡 Login is optional - all features are accessible without login!")
