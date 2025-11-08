@@ -120,37 +120,19 @@ show_login = st.query_params.get('login') == 'true'
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# IMPROVED LOGIN MODAL
+# IMPROVED LOGIN FORM - NO OVERLAY BLOCKING
 if show_login and not st.session_state.logged_in:
-    st.markdown("""
-    <style>
-    .login-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 2000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .login-modal {
-        background: #1e1e1e;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        max-width: 400px;
-        width: 90%;
-    }
-    </style>
-    <div class="login-overlay"></div>
-    """, unsafe_allow_html=True)
-    
     st.markdown("### 🔐 Login to DIET Career Buddy")
     st.info("💡 Login is optional - all features are accessible without login!")
     
+    # Close button at top
+    col_close1, col_close2 = st.columns([6, 1])
+    with col_close2:
+        if st.button("❌ Close", key="close_login_top"):
+            st.query_params.clear()
+            st.rerun()
+    
+    # Login form
     with st.form("login_form"):
         username = st.text_input("Username", placeholder="Enter your username")
         password = st.text_input("Password", type="password", placeholder="Enter your password")
@@ -159,9 +141,7 @@ if show_login and not st.session_state.logged_in:
         with col1:
             submit = st.form_submit_button("🚀 Login", use_container_width=True, type="primary")
         with col2:
-            if st.form_submit_button("❌ Cancel", use_container_width=True):
-                st.query_params.clear()
-                st.rerun()
+            cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
         
         if submit:
             if username == "admin" and password == "password":
@@ -174,6 +154,10 @@ if show_login and not st.session_state.logged_in:
                 st.error("❌ Invalid credentials!")
             else:
                 st.error("❌ Please enter username and password!")
+        
+        if cancel:
+            st.query_params.clear()
+            st.rerun()
     
     st.info("**Demo Credentials:** username: `admin` | password: `password`")
     st.stop()
