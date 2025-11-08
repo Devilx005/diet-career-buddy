@@ -76,9 +76,6 @@ else:
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
         </div>
-        <div style="text-align: right;">
-            <div id="login-container"></div>
-        </div>
     </div>
     '''
 
@@ -87,29 +84,20 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# LOGIN/LOGOUT BUTTON - SPECIFIC CSS SELECTOR
+# LOGIN/LOGOUT BUTTON - IN TITLE BAR
 if not st.session_state.logged_in:
-    # Create a unique container for the login button
-    login_col1, login_col2 = st.columns([10, 1])
-    with login_col2:
-        if st.button("🔐 Login", key="header_login_btn"):
-            st.session_state.show_login = True
-            st.rerun()
+    if st.button("🔐 Login", key="header_login_btn"):
+        st.session_state.show_login = True
+        st.rerun()
     
-    # Target ONLY this specific button by its parent column
+    # Position button in title bar right corner
     st.markdown("""
     <style>
-    /* Target only the login button container, not all buttons */
-    div[data-testid="column"]:has(button[key="header_login_btn"]) {
-        position: fixed !important;
-        top: 0px !important;
-        right: 0px !important;
-        z-index: 1001 !important;
-        width: auto !important;
-    }
-    
-    /* Style ONLY the login button */
     button[key="header_login_btn"] {
+        position: fixed !important;
+        top: 12px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
         background: rgba(16, 163, 127, 0.8) !important;
         color: white !important;
         border: none !important;
@@ -117,7 +105,6 @@ if not st.session_state.logged_in:
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        margin: 10px 20px !important;
     }
     
     button[key="header_login_btn"]:hover {
@@ -127,24 +114,18 @@ if not st.session_state.logged_in:
     """, unsafe_allow_html=True)
 
 if st.session_state.logged_in:
-    logout_col1, logout_col2 = st.columns([10, 1])
-    with logout_col2:
-        if st.button("Logout", key="header_logout_btn"):
-            st.session_state.logged_in = False
-            st.session_state.username = ""
-            st.rerun()
+    if st.button("Logout", key="header_logout_btn"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.rerun()
     
     st.markdown("""
     <style>
-    div[data-testid="column"]:has(button[key="header_logout_btn"]) {
-        position: fixed !important;
-        top: 0px !important;
-        right: 0px !important;
-        z-index: 1001 !important;
-        width: auto !important;
-    }
-    
     button[key="header_logout_btn"] {
+        position: fixed !important;
+        top: 12px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
         background: transparent !important;
         color: #ff6b6b !important;
         border: 1px solid #ff6b6b !important;
@@ -152,7 +133,6 @@ if st.session_state.logged_in:
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        margin: 10px 20px !important;
     }
     
     button[key="header_logout_btn"]:hover {
@@ -162,8 +142,13 @@ if st.session_state.logged_in:
     </style>
     """, unsafe_allow_html=True)
 
-# LOGIN FORM
+# LOGIN FORM WITH BACK BUTTON
 if st.session_state.show_login and not st.session_state.logged_in:
+    # Back button at top
+    if st.button("← Back", key="back_from_login"):
+        st.session_state.show_login = False
+        st.rerun()
+    
     st.markdown("### 🔐 Login to DIET Career Buddy")
     st.info("💡 Login is optional - all features are accessible without login!")
     
