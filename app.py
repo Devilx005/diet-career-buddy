@@ -27,8 +27,15 @@ if 'username' not in st.session_state:
     st.session_state.username = ""
 if 'show_login' not in st.session_state:
     st.session_state.show_login = False
+if 'login_clicked' not in st.session_state:
+    st.session_state.login_clicked = False
 
-# HEADER WITH LOGIN BUTTON
+# Check for login click from JavaScript
+if st.query_params.get('trigger_login') == 'true':
+    st.session_state.show_login = True
+    st.query_params.clear()
+
+# HEADER WITH PURE HTML LOGIN BUTTON
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -52,6 +59,20 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
+            <a href="?logout=true" style="
+                background: transparent;
+                color: #ff6b6b;
+                border: 1px solid #ff6b6b;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 14px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='#ff6b6b'; this.style.color='white';" 
+               onmouseout="this.style.background='transparent'; this.style.color='#ff6b6b';">
+                Logout
+            </a>
         </div>
     </div>
     '''
@@ -76,71 +97,36 @@ else:
         <div style="font-size: 1.4em; font-weight: 700; color: #10a37f; text-align: center; flex: 1;">
             🎓 DIET Career Buddy
         </div>
+        <div style="text-align: right;">
+            <a href="?trigger_login=true" style="
+                background: rgba(16, 163, 127, 0.8);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 14px;
+                text-decoration: none;
+                display: inline-block;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='#10a37f'; this.style.transform='scale(1.05)';" 
+               onmouseout="this.style.background='rgba(16, 163, 127, 0.8)'; this.style.transform='scale(1)';">
+                🔐 Login
+            </a>
+        </div>
     </div>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
 
+# Handle logout
+if st.query_params.get('logout') == 'true':
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.query_params.clear()
+    st.rerun()
+
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
-
-# LOGIN/LOGOUT BUTTON - IN TITLE BAR
-if not st.session_state.logged_in:
-    if st.button("🔐 Login", key="header_login_btn"):
-        st.session_state.show_login = True
-        st.rerun()
-    
-    # Position button in title bar right corner
-    st.markdown("""
-    <style>
-    button[key="header_login_btn"] {
-        position: fixed !important;
-        top: 12px !important;
-        right: 20px !important;
-        z-index: 1001 !important;
-        background: rgba(16, 163, 127, 0.8) !important;
-        color: white !important;
-        border: none !important;
-        padding: 8px 16px !important;
-        border-radius: 6px !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-    }
-    
-    button[key="header_login_btn"]:hover {
-        background: #10a37f !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-if st.session_state.logged_in:
-    if st.button("Logout", key="header_logout_btn"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.rerun()
-    
-    st.markdown("""
-    <style>
-    button[key="header_logout_btn"] {
-        position: fixed !important;
-        top: 12px !important;
-        right: 20px !important;
-        z-index: 1001 !important;
-        background: transparent !important;
-        color: #ff6b6b !important;
-        border: 1px solid #ff6b6b !important;
-        padding: 6px 12px !important;
-        border-radius: 6px !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-    }
-    
-    button[key="header_logout_btn"]:hover {
-        background: #ff6b6b !important;
-        color: white !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 # LOGIN FORM WITH BACK BUTTON
 if st.session_state.show_login and not st.session_state.logged_in:
