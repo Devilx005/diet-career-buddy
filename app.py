@@ -52,7 +52,6 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
-            <div id="logout-container"></div>
         </div>
     </div>
     '''
@@ -88,25 +87,29 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# LOGIN/LOGOUT BUTTON - Better CSS approach
+# LOGIN/LOGOUT BUTTON - SPECIFIC CSS SELECTOR
 if not st.session_state.logged_in:
-    if st.button("🔐 Login", key="header_login_btn"):
-        st.session_state.show_login = True
-        st.rerun()
+    # Create a unique container for the login button
+    login_col1, login_col2 = st.columns([10, 1])
+    with login_col2:
+        if st.button("🔐 Login", key="header_login_btn"):
+            st.session_state.show_login = True
+            st.rerun()
     
-    # Move button to header with improved CSS
+    # Target ONLY this specific button by its parent column
     st.markdown("""
     <style>
-    /* Hide the original container */
-    .stButton {
+    /* Target only the login button container, not all buttons */
+    div[data-testid="column"]:has(button[key="header_login_btn"]) {
         position: fixed !important;
-        top: 10px !important;
-        right: 20px !important;
+        top: 0px !important;
+        right: 0px !important;
         z-index: 1001 !important;
+        width: auto !important;
     }
     
-    /* Style the button itself */
-    .stButton > button {
+    /* Style ONLY the login button */
+    button[key="header_login_btn"] {
         background: rgba(16, 163, 127, 0.8) !important;
         color: white !important;
         border: none !important;
@@ -114,33 +117,34 @@ if not st.session_state.logged_in:
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        transition: all 0.3s ease !important;
+        margin: 10px 20px !important;
     }
     
-    .stButton > button:hover {
+    button[key="header_login_btn"]:hover {
         background: #10a37f !important;
-        transform: scale(1.05) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
 if st.session_state.logged_in:
-    if st.button("Logout", key="header_logout_btn"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.rerun()
+    logout_col1, logout_col2 = st.columns([10, 1])
+    with logout_col2:
+        if st.button("Logout", key="header_logout_btn"):
+            st.session_state.logged_in = False
+            st.session_state.username = ""
+            st.rerun()
     
-    # Move logout button to header
     st.markdown("""
     <style>
-    .stButton {
+    div[data-testid="column"]:has(button[key="header_logout_btn"]) {
         position: fixed !important;
-        top: 10px !important;
-        right: 20px !important;
+        top: 0px !important;
+        right: 0px !important;
         z-index: 1001 !important;
+        width: auto !important;
     }
     
-    .stButton > button {
+    button[key="header_logout_btn"] {
         background: transparent !important;
         color: #ff6b6b !important;
         border: 1px solid #ff6b6b !important;
@@ -148,9 +152,10 @@ if st.session_state.logged_in:
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
+        margin: 10px 20px !important;
     }
     
-    .stButton > button:hover {
+    button[key="header_logout_btn"]:hover {
         background: #ff6b6b !important;
         color: white !important;
     }
