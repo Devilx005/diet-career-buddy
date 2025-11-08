@@ -1,6 +1,5 @@
 import streamlit as st
 from styles import get_main_css
-import streamlit.components.v1 as components
 
 # Import all dashboards (from root directory)
 import tech_dashboard
@@ -53,7 +52,7 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
-            <button onclick="triggerLogout()" style="
+            <button onclick="clickLogout()" style="
                 background: transparent;
                 color: #ff6b6b;
                 border: 1px solid #ff6b6b;
@@ -71,13 +70,14 @@ if st.session_state.logged_in:
     </div>
     
     <script>
-    function triggerLogout() {{
+    function clickLogout() {{
         const buttons = window.parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {{
-            if (btn.textContent.includes('HIDDEN_LOGOUT')) {{
+        for(let btn of buttons) {{
+            if(btn.innerText === 'LOGOUT_TRIGGER_BTN') {{
                 btn.click();
+                break;
             }}
-        }});
+        }}
     }}
     </script>
     '''
@@ -103,7 +103,7 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="text-align: right;">
-            <button onclick="triggerLogin()" style="
+            <button onclick="clickLogin()" style="
                 background: rgba(16, 163, 127, 0.8);
                 color: white;
                 padding: 8px 16px;
@@ -121,13 +121,14 @@ else:
     </div>
     
     <script>
-    function triggerLogin() {
+    function clickLogin() {
         const buttons = window.parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if (btn.textContent.includes('HIDDEN_LOGIN')) {
+        for(let btn of buttons) {
+            if(btn.innerText === 'LOGIN_TRIGGER_BTN') {
                 btn.click();
+                break;
             }
-        });
+        }
     }
     </script>
     '''
@@ -137,42 +138,40 @@ st.markdown(header_html, unsafe_allow_html=True)
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
+# CSS TO HIDE TRIGGER BUTTONS
+st.markdown("""
+<style>
+/* Hide trigger buttons completely */
+.element-container:has(button:contains('LOGIN_TRIGGER_BTN')),
+.element-container:has(button:contains('LOGOUT_TRIGGER_BTN')) {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+button:contains('LOGIN_TRIGGER_BTN'),
+button:contains('LOGOUT_TRIGGER_BTN') {
+    display: none !important;
+    visibility: hidden !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # HIDDEN LOGIN TRIGGER - NO URL CHANGE
 if not st.session_state.logged_in:
-    if st.button("HIDDEN_LOGIN", key="hidden_login_trigger"):
+    if st.button("LOGIN_TRIGGER_BTN", key="login_trigger"):
         st.session_state.show_login = True
         st.rerun()
-    
-    # Hide this button completely
-    st.markdown("""
-    <style>
-    button[key="hidden_login_trigger"] {
-        display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        left: -9999px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 # HIDDEN LOGOUT TRIGGER
 if st.session_state.logged_in:
-    if st.button("HIDDEN_LOGOUT", key="hidden_logout_trigger"):
+    if st.button("LOGOUT_TRIGGER_BTN", key="logout_trigger"):
         st.session_state.logged_in = False
         st.session_state.username = ""
         st.rerun()
-    
-    # Hide this button completely
-    st.markdown("""
-    <style>
-    button[key="hidden_logout_trigger"] {
-        display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        left: -9999px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 # LOGIN FORM WITH BACK BUTTON
 if st.session_state.show_login and not st.session_state.logged_in:
