@@ -1,5 +1,6 @@
 import streamlit as st
 from styles import get_main_css
+import streamlit.components.v1 as components
 
 # Import all dashboards (from root directory)
 import tech_dashboard
@@ -27,15 +28,8 @@ if 'username' not in st.session_state:
     st.session_state.username = ""
 if 'show_login' not in st.session_state:
     st.session_state.show_login = False
-if 'login_clicked' not in st.session_state:
-    st.session_state.login_clicked = False
 
-# Check for login click from JavaScript
-if st.query_params.get('trigger_login') == 'true':
-    st.session_state.show_login = True
-    st.query_params.clear()
-
-# HEADER WITH PURE HTML LOGIN BUTTON
+# HEADER WITH LOGIN BUTTON
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -59,7 +53,7 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
-            <a href="?logout=true" style="
+            <button onclick="triggerLogout()" style="
                 background: transparent;
                 color: #ff6b6b;
                 border: 1px solid #ff6b6b;
@@ -67,14 +61,25 @@ if st.session_state.logged_in:
                 border-radius: 6px;
                 font-weight: 600;
                 font-size: 14px;
-                text-decoration: none;
+                cursor: pointer;
                 transition: all 0.3s ease;
             " onmouseover="this.style.background='#ff6b6b'; this.style.color='white';" 
                onmouseout="this.style.background='transparent'; this.style.color='#ff6b6b';">
                 Logout
-            </a>
+            </button>
         </div>
     </div>
+    
+    <script>
+    function triggerLogout() {{
+        const buttons = window.parent.document.querySelectorAll('button');
+        buttons.forEach(btn => {{
+            if (btn.textContent.includes('HIDDEN_LOGOUT')) {{
+                btn.click();
+            }}
+        }});
+    }}
+    </script>
     '''
 else:
     header_html = '''
@@ -98,35 +103,76 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="text-align: right;">
-            <a href="?trigger_login=true" style="
+            <button onclick="triggerLogin()" style="
                 background: rgba(16, 163, 127, 0.8);
                 color: white;
                 padding: 8px 16px;
                 border-radius: 6px;
                 font-weight: 600;
                 font-size: 14px;
-                text-decoration: none;
-                display: inline-block;
+                border: none;
+                cursor: pointer;
                 transition: all 0.3s ease;
             " onmouseover="this.style.background='#10a37f'; this.style.transform='scale(1.05)';" 
                onmouseout="this.style.background='rgba(16, 163, 127, 0.8)'; this.style.transform='scale(1)';">
                 🔐 Login
-            </a>
+            </button>
         </div>
     </div>
+    
+    <script>
+    function triggerLogin() {
+        const buttons = window.parent.document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            if (btn.textContent.includes('HIDDEN_LOGIN')) {
+                btn.click();
+            }
+        });
+    }
+    </script>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
 
-# Handle logout
-if st.query_params.get('logout') == 'true':
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-    st.query_params.clear()
-    st.rerun()
-
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
+
+# HIDDEN LOGIN TRIGGER - NO URL CHANGE
+if not st.session_state.logged_in:
+    if st.button("HIDDEN_LOGIN", key="hidden_login_trigger"):
+        st.session_state.show_login = True
+        st.rerun()
+    
+    # Hide this button completely
+    st.markdown("""
+    <style>
+    button[key="hidden_login_trigger"] {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# HIDDEN LOGOUT TRIGGER
+if st.session_state.logged_in:
+    if st.button("HIDDEN_LOGOUT", key="hidden_logout_trigger"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.rerun()
+    
+    # Hide this button completely
+    st.markdown("""
+    <style>
+    button[key="hidden_logout_trigger"] {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # LOGIN FORM WITH BACK BUTTON
 if st.session_state.show_login and not st.session_state.logged_in:
