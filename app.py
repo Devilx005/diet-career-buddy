@@ -25,8 +25,10 @@ if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'username' not in st.session_state:
     st.session_state.username = ""
+if 'show_login' not in st.session_state:
+    st.session_state.show_login = False
 
-# IMPROVED HEADER WITH LOGIN IN RIGHT CORNER
+# HEADER WITH LOGIN BUTTON
 if st.session_state.logged_in:
     header_html = f'''
     <div style="
@@ -50,18 +52,6 @@ if st.session_state.logged_in:
         </div>
         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">
             <span style="color: #a0aec0; font-size: 14px;">👋 {st.session_state.username}</span>
-            <a href="?logout=true" style="
-                color: #ff6b6b;
-                text-decoration: none;
-                font-size: 14px;
-                padding: 6px 12px;
-                border: 1px solid #ff6b6b;
-                border-radius: 6px;
-                transition: all 0.3s ease;
-            " onmouseover="this.style.background='#ff6b6b'; this.style.color='white';" 
-               onmouseout="this.style.background='transparent'; this.style.color='#ff6b6b';">
-                Logout
-            </a>
         </div>
     </div>
     '''
@@ -87,52 +77,72 @@ else:
             🎓 DIET Career Buddy
         </div>
         <div style="text-align: right;">
-            <a href="?login=true" style="
-                background: rgba(16, 163, 127, 0.8);
-                color: white;
-                text-decoration: none;
-                padding: 8px 16px;
-                border-radius: 6px;
-                font-weight: 600;
-                font-size: 14px;
-                display: inline-block;
-                transition: all 0.3s ease;
-            " onmouseover="this.style.background='#10a37f'; this.style.transform='scale(1.05)';" 
-               onmouseout="this.style.background='rgba(16, 163, 127, 0.8)'; this.style.transform='scale(1)';">
-                🔐 Login
-            </a>
+            <!-- Login button will be positioned here with CSS -->
         </div>
     </div>
     '''
 
 st.markdown(header_html, unsafe_allow_html=True)
 
-# Handle logout
-if st.query_params.get('logout') == 'true':
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-    st.query_params.clear()
-    st.rerun()
-
-# Handle login trigger
-show_login = st.query_params.get('login') == 'true'
-
 # MAIN CONTENT
 st.markdown('<div style="margin-top: 60px;">', unsafe_allow_html=True)
 
-# IMPROVED LOGIN FORM - NO OVERLAY BLOCKING
-if show_login and not st.session_state.logged_in:
+# LOGIN BUTTON IN HEADER (positioned with CSS)
+if not st.session_state.logged_in:
+    if st.button("🔐 Login", key="header_login_btn"):
+        st.session_state.show_login = True
+        st.rerun()
+    
+    # Position login button in header
+    st.markdown("""
+    <style>
+    button[kind="secondary"][key="header_login_btn"] {
+        position: fixed !important;
+        top: 10px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
+        background: rgba(16, 163, 127, 0.8) !important;
+        color: white !important;
+        border: none !important;
+        padding: 8px 16px !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# LOGOUT BUTTON (if logged in)
+if st.session_state.logged_in:
+    if st.button("Logout", key="header_logout_btn"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.rerun()
+    
+    # Position logout button in header
+    st.markdown("""
+    <style>
+    button[kind="secondary"][key="header_logout_btn"] {
+        position: fixed !important;
+        top: 10px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
+        background: transparent !important;
+        color: #ff6b6b !important;
+        border: 1px solid #ff6b6b !important;
+        padding: 6px 12px !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# LOGIN FORM (seamless, no URL change)
+if st.session_state.show_login and not st.session_state.logged_in:
     st.markdown("### 🔐 Login to DIET Career Buddy")
     st.info("💡 Login is optional - all features are accessible without login!")
     
-    # Close button at top
-    col_close1, col_close2 = st.columns([6, 1])
-    with col_close2:
-        if st.button("❌ Close", key="close_login_top"):
-            st.query_params.clear()
-            st.rerun()
-    
-    # Login form
     with st.form("login_form"):
         username = st.text_input("Username", placeholder="Enter your username")
         password = st.text_input("Password", type="password", placeholder="Enter your password")
@@ -147,7 +157,7 @@ if show_login and not st.session_state.logged_in:
             if username == "admin" and password == "password":
                 st.session_state.logged_in = True
                 st.session_state.username = username
-                st.query_params.clear()
+                st.session_state.show_login = False
                 st.success("✅ Login successful!")
                 st.rerun()
             elif username and password:
@@ -156,7 +166,7 @@ if show_login and not st.session_state.logged_in:
                 st.error("❌ Please enter username and password!")
         
         if cancel:
-            st.query_params.clear()
+            st.session_state.show_login = False
             st.rerun()
     
     st.info("**Demo Credentials:** username: `admin` | password: `password`")
